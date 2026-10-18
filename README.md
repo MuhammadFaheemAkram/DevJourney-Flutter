@@ -33,8 +33,8 @@ DevJourney is built in **strict, reviewable phases**. Each phase ends with:
 | Phase | Scope | Status |
 |------:|-------|:------:|
 | 1 | Foundation: FVM project, design system base, typed routes with an onboarding gate, 5-tab shell with a navigation drawer, CI | ✅ Done |
-| 2 | Data models, drift store, the fake learning API and the catalog; Welcome | ⏳ Next |
-| 3 | Roadmaps, the learning path, topics and the Dashboard | |
+| 2 | Data models, drift store, the fake learning API and the catalog; Welcome | ✅ Done |
+| 3 | Roadmaps, the learning path, topics and the Dashboard | ⏳ Next |
 | 4 | Notes (Markdown) and goals | |
 | 5 | Challenges, resources and global search (FTS5) | |
 | 6 | Analytics, settings and daily reminders | |
@@ -71,10 +71,15 @@ Packages arrive in the phase that first needs them.
 | UI | [`material_ui`](https://pub.dev/packages/material_ui): Material 3 as a standalone package; adaptive widgets on iOS where it matters | 1 |
 | Navigation | `go_router` + `go_router_builder` (typed routes, `StatefulShellRoute`, an onboarding `redirect`) | 1 |
 | Dependency injection | `get_it` + `injectable` (a code-generated composition root) | 1 |
+| State management | `flutter_bloc`: Cubits (and, in Phase 5, one Bloc for search) | 2 |
+| Models | `freezed` (domain models, states) + `json_serializable` (the API's DTOs, `checked: true`) | 2 |
+| Database | `drift` + `drift_flutter` (SQLite): the catalog and the user's data, with foreign keys, `CHECK` constraints, indexes and exported schema versions | 2 |
+| Preferences | `shared_preferences` (`SharedPreferencesWithCache`, loaded before `runApp`) | 2 |
+| Time | `clock` (an injected `Clock`: "today" decides streaks, goal periods and demo dates) | 2 |
 | Lints / CI | `flutter_lints` + strict analyzer modes; GitHub Actions | 1 |
-| Testing | `flutter_test` | 1 |
+| Testing | `flutter_test`, `bloc_test`, `mocktail` | 1+ |
 
-Planned: `flutter_bloc`, `freezed`, `drift` (with FTS5), `shared_preferences`, `clock` (Phase 2); `bloc_concurrency`, `stream_transform`, `intl` (Phase 3); a Markdown renderer (Phase 4); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
+Planned: FTS5 search (Phase 5); `bloc_concurrency`, `stream_transform`, `intl` (Phase 3); a Markdown renderer (Phase 4); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
 
 ---
 
@@ -85,11 +90,19 @@ A clean, layered architecture with a one-directional data flow:
 ```
 lib/
 ├── app/        → root widget (MaterialApp.router, themes)
-├── core/       → design system, navigation, (later) the fake API, database, storage, platform services
-├── data/       → repository implementations + mappers          (Phase 2)
-├── domain/     → models, pure calculations, contracts, use cases (Phase 2)
+├── core/       → design system, navigation, the fake learning API, database, storage, (later) platform services
+├── data/       → repository implementations + mappers
+├── domain/     → models, (later) pure calculations, contracts, use cases (pure Dart)
 ├── features/   → one folder per screen (Page + View + Cubit/Bloc)
 └── di/         → composition root (get_it + injectable)
+```
+
+**Data flow:**
+
+```
+View ─intent─▶ Cubit ─▶ UseCase ─▶ Repository ─▶ drift ◀── watch() streams ── Cubit ─▶ state ─▶ View
+FakeLearningService (bundled JSON, 700 ms) ─▶ CatalogRepository.sync() ─▶ drift catalog tables (one upsert transaction)
+                                             CatalogRepository.loadDemoProgress() ─▶ drift user tables (one transaction)
 ```
 
 **Navigation:**
@@ -115,6 +128,14 @@ Key rules:
 - **Widgets render state; logic lives elsewhere.** Each screen is a Page plus a View.
 - **Layer boundaries:** `domain/` is pure Dart, Views never import `data/`, and only `data/` touches the database.
 
+**Who owns what:**
+
+| Data | Source of truth |
+|---|---|
+| roadmaps, sections, topics, resources, challenges (the catalog) | the fake learning API; cached in drift, refreshed by a sync |
+| completions, bookmarks, notes, goals, check-ins, challenge state | drift, on the device (no sync ever writes them) |
+| onboarded, the active roadmap, the catalog version | `SharedPreferencesWithCache` |
+
 ---
 
 ## 🗂️ Folder Structure
@@ -130,12 +151,20 @@ DevJourney/
 │   ├── app/                        # DevJourneyApp: themes and the router
 │   ├── core/
 │   │   ├── design_system/          # theme/ (AppTheme, AppColors, tokens), widgets/ (state views, SectionHeader), large_text
-│   │   └── navigation/             # app_routes (+ .g.dart), app_router, onboarding_redirect, fallback Close button
+│   │   ├── navigation/             # app_routes (+ .g.dart), app_router, onboarding_redirect, stream_listenable, Close fallback
+│   │   ├── network/                # LearningService + FakeLearningService, NetworkSimulator, dto/, asset_json_loader
+│   │   ├── storage/                # settings_local_data_source (SharedPreferencesWithCache)
+│   │   ├── database/               # app_database (drift v1), converters, tables/ (catalog, user), daos/ (catalog, user data)
+│   │   └── common/                 # Result, AppException, firstValue, IdGenerator
+│   ├── data/                       # mapper/ (the API's catalog → rows, the demo progress → rows), repository/
+│   ├── domain/                     # model/ (CalendarDate, the catalog, RoadmapProgress, AppSettings), repository/, usecase/
 │   ├── features/                   # welcome, shell (tabs + drawer), dashboard, roadmaps, roadmap_detail, topic_detail,
 │   │                               # notes, note_editor, goals, challenges, challenge_detail, resources, search,
 │   │                               # analytics, settings, about
-│   └── di/                         # injection.dart (+ .config.dart)
-└── test/                           # mirrors lib/, plus app/ (the accessibility tour) and helpers/
+│   └── di/                         # injection.dart (+ .config.dart), app_module.dart
+├── assets/json/                    # the fake API's responses: catalog_v1.json, demo_progress.json
+├── drift_schemas/                  # every exported schema version (drift_dev make-migrations)
+└── test/                           # mirrors lib/, plus app/ (flows, the accessibility tour) and helpers/
 ```
 
 ---
@@ -159,6 +188,26 @@ Generated code (`*.g.dart`, `*.config.dart`) is committed, so the app runs strai
 fvm dart run build_runner build
 ```
 
+On first launch the app fetches the learning catalog (four roadmaps, 32 topics, 35 resources, 12 challenges), then asks which roadmap to start with: **Start learning** fresh, or **Explore with demo progress** (completions, notes, goals and challenge status over the last three weeks). The choice is saved: the next launch opens on the Dashboard.
+
+---
+
+## 🌐 How the Fake API and Sync Work
+
+There is no server. `FakeLearningService` is the app's only "remote" API:
+- **Production-shaped:** an abstract `LearningService`, typed DTOs (`json_serializable`, `checked: true`) in the nested shape a real API would use (roadmaps → sections → topics), and `AppException`s, so a real client could replace the fake without changing any caller.
+- **The network is simulated:** `NetworkSimulator` waits 700 ms and can fail every request, as if offline. Welcome shows the error, with **Try again**.
+- **Checked before writing:** unique ids, non-blank titles, positive durations, `https` URLs, resources pointing at real topics. Broken content fails with "The learning content looks damaged" before anything is written.
+- **The sync is an upsert, in one transaction:** new content is inserted, existing content updated in place by its stable id, and the user's tables are never touched. It uses `INSERT … ON CONFLICT DO UPDATE`, never `INSERT OR REPLACE`: SQLite's `REPLACE` deletes the old row first, and that delete would cascade to the user's progress and notes. A test pins it.
+- **Demo progress has relative dates** (`daysAgo`), resolved against today when it loads, so the demo always shows a live streak.
+
+## 💾 How Local Persistence Works
+
+- **Schema v1:** the catalog (`roadmaps`, `roadmap_sections`, `topics`, `resources`, `challenges`) and the user's tables (`topic_progress`, `topic_bookmarks`, `resource_bookmarks`, `notes`, `goals`, `goal_check_ins`, `challenge_states`), keyed by catalog ids. Foreign keys are on (`PRAGMA foreign_keys = ON`), and the schema is exported to [`drift_schemas/`](drift_schemas/) from the first version.
+- **Days are `CalendarDate`s** (`yyyymmdd` integers) taken from the local clock when the action happens, so a streak counts the user's days; instants are UTC text, for ordering.
+- **Nothing derived is stored:** no percentage, count or streak column exists. Roadmap progress is a `LEFT JOIN … GROUP BY` over topics and completions, recomputed whenever either changes.
+- **Preferences** live in `SharedPreferencesWithCache`, loaded before `runApp`, so the router knows at once whether to open Welcome or the Dashboard.
+
 ---
 
 ## ✅ Testing
@@ -169,11 +218,13 @@ fvm dart format --output=none --set-exit-if-changed .
 fvm flutter test
 ```
 
-**104 tests** after Phase 1:
+**171 tests** after Phase 2:
+- **Data:** the catalog mapper (flattening, sources, every validation rule), the demo progress mapper (relative dates, instants, every validation rule), the bundled JSON itself, the DAOs (upsert counts, updates in place, **user data surviving a re-sync**, progress counts with zeros, `CHECK`, `SET NULL`, rollback), the fake service, the repositories (sync, re-sync, demo progress, offline, malformed content), the settings, the start use cases.
+- **Welcome:** the Cubit on the real data stack (load, failure and retry, the chosen roadmap, a double tap, a failed demo), the view with a mocked Cubit, and the real app's first launch (start learning, demo progress, offline and Try again).
 - **Navigation:** every rule of the onboarding gate; typed locations; the app on its real DI graph (first launch, each tab, the drawer over every tab, each drawer screen and Back, Search from the app bars, the note editor as a full-screen dialog, deep links with a Close button, an unknown location).
 - **Design system:** the themes, any `ColorScheme` driving them (for dynamic color later), and WCAG AA contrast of every learning color (completed, streak, the three difficulties) on the page, cards and filled fields in both themes.
 - **The drawer:** its order, the selected tab, where each item leads.
-- **The accessibility tour:** every screen, and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
+- **The accessibility tour:** every screen, Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
 
 CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every pull request. It installs the FVM-pinned Flutter, checks that the committed generated code is up to date, then runs format, analyze and test.
 
@@ -193,6 +244,7 @@ CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every p
 | Navigation | bottom bar + `ModalNavigationDrawer` | `TabView` + More | `StatefulShellRoute` + `NavigationBar` + a `Drawer` |
 | Screen state | ViewModel + StateFlow | `@Observable` | Cubit / Bloc |
 | Storage | Room + DataStore | SwiftData + `@AppStorage` | drift + `SharedPreferencesWithCache` |
+| Fake API | fake API layer, "sync" | `LearningService` seeds SwiftData | `LearningService` + an upsert sync that never touches user data |
 | DI | Hilt | `AppEnvironment` | `get_it` + `injectable` |
 
 ---
@@ -200,6 +252,7 @@ CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every p
 ## 📚 Documentation
 
 - [Phase 1 — Foundation](docs/PHASE_1_SUMMARY.md)
+- [Phase 2 — Data Layer](docs/PHASE_2_SUMMARY.md)
 
 ---
 

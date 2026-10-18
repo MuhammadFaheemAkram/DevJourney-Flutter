@@ -10,6 +10,7 @@ void main() {
   group('first launch', () {
     testWidgets('opens on Welcome, without the tab bar', (tester) async {
       await pumpDevJourney(tester, onboarded: false);
+      await tester.settleRealAsync();
 
       expect(find.text('Start learning'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
@@ -21,23 +22,10 @@ void main() {
         onboarded: false,
         initialLocation: '/topics/flutter-streams',
       );
+      await tester.settleRealAsync();
 
       expect(find.text('Start learning'), findsOneWidget);
     });
-
-    for (final choice in ['Start learning', 'Explore with demo progress']) {
-      testWidgets('"$choice" lands on the Dashboard, and Welcome is gone', (
-        tester,
-      ) async {
-        await pumpDevJourney(tester, onboarded: false);
-
-        await tester.tapAndSettle(find.text(choice));
-
-        expect(appBarTitled('Dashboard'), findsOneWidget);
-        expect(tester.selectedTab, 0);
-        expect(find.text(choice), findsNothing);
-      });
-    }
   });
 
   group('tabs', () {

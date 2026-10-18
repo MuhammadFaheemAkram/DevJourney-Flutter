@@ -1,6 +1,7 @@
 /// One import for the whole design system: theme, tokens and shared widgets.
 library;
 
+export 'package:dev_journey/core/design_system/formatting/labels.dart';
 export 'package:dev_journey/core/design_system/large_text.dart';
 export 'package:dev_journey/core/design_system/theme/app_colors.dart';
 export 'package:dev_journey/core/design_system/theme/app_icon_size.dart';

@@ -1,3 +1,4 @@
+import 'package:dev_journey/core/network/network_simulator.dart';
 import 'package:dev_journey/di/injection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -17,12 +18,20 @@ void main() {
         WidgetTester tester, {
         required String at,
         bool onboarded = true,
+        Future<void> Function()? beforeLaunch,
       }) async {
         tester.platformDispatcher
           ..textScaleFactorTestValue = 2
           ..platformBrightnessTestValue = brightness;
         addTearDown(tester.platformDispatcher.clearAllTestValues);
-        await pumpDevJourney(tester, onboarded: onboarded, initialLocation: at);
+        await pumpDevJourney(
+          tester,
+          onboarded: onboarded,
+          initialLocation: at,
+          beforeLaunch: beforeLaunch,
+        );
+        // Welcome syncs the catalog on the real event loop (§11.44).
+        await tester.settleRealAsync();
         // Phone width, but tall enough to lay out every item of a long list:
         // the checks below see only what is built.
         tester.view.physicalSize = const Size(390 * 3, 6000 * 3);
@@ -40,8 +49,21 @@ void main() {
         handle.dispose();
       }
 
-      testWidgets('Welcome', (tester) async {
+      testWidgets('Welcome, the roadmaps to pick from', (tester) async {
         await open(tester, at: '/welcome', onboarded: false);
+        expect(find.text('Pick a roadmap to start with'), findsOneWidget);
+        await expectAccessible(tester);
+      });
+
+      testWidgets('Welcome, offline', (tester) async {
+        await open(
+          tester,
+          at: '/welcome',
+          onboarded: false,
+          beforeLaunch: () async =>
+              getIt<NetworkSimulator>().failRequests = true,
+        );
+        expect(find.text('Try again'), findsOneWidget);
         await expectAccessible(tester);
       });
 

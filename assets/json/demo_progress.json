@@ -1,0 +1,128 @@
+{
+  "completedTopics": [
+    {
+      "topicId": "flutter-dart-basics",
+      "daysAgo": 20
+    },
+    {
+      "topicId": "flutter-null-safety",
+      "daysAgo": 19
+    },
+    {
+      "topicId": "sd-scalability",
+      "daysAgo": 10
+    },
+    {
+      "topicId": "backend-python",
+      "daysAgo": 8
+    },
+    {
+      "topicId": "flutter-async",
+      "daysAgo": 6
+    },
+    {
+      "topicId": "backend-http",
+      "daysAgo": 5
+    },
+    {
+      "topicId": "flutter-streams",
+      "daysAgo": 5
+    },
+    {
+      "topicId": "flutter-widgets",
+      "daysAgo": 3
+    },
+    {
+      "topicId": "flutter-layout",
+      "daysAgo": 2
+    },
+    {
+      "topicId": "flutter-navigation",
+      "daysAgo": 1
+    }
+  ],
+  "bookmarkedTopics": [
+    "flutter-state",
+    "ai-rag"
+  ],
+  "bookmarkedResources": [
+    "res-drift",
+    "res-system-design-primer"
+  ],
+  "notes": [
+    {
+      "id": "note-streams",
+      "title": "Streams cheat sheet",
+      "topicId": "flutter-streams",
+      "daysAgo": 5,
+      "content": "# Streams\n\n- **Single-subscription** by default; `asBroadcastStream()` for many listeners.\n- Always keep the `StreamSubscription` and `cancel()` it.\n- `await for` reads a stream like a loop.\n\n```dart\nawait for (final value in numbers()) {\n  print(value);\n}\n```\n"
+    },
+    {
+      "id": "note-null-safety",
+      "title": "Null safety gotchas",
+      "topicId": "flutter-null-safety",
+      "daysAgo": 19,
+      "content": "Promotion doesn't work on fields: copy to a local first.\n\n`late` means *trust me*: a read before the write throws.\n"
+    },
+    {
+      "id": "note-interview",
+      "title": "Interview questions to practise",
+      "daysAgo": 2,
+      "content": "1. When would you pick a Bloc over a Cubit?\n2. How does a widget rebuild?\n3. Explain `const` constructors.\n"
+    }
+  ],
+  "goals": [
+    {
+      "id": "goal-weekly-topics",
+      "title": "Complete 3 topics a week",
+      "kind": "topics",
+      "period": "weekly",
+      "target": 3,
+      "daysAgo": 14
+    },
+    {
+      "id": "goal-monthly-topics",
+      "title": "Finish 10 topics this month",
+      "kind": "topics",
+      "period": "monthly",
+      "target": 10,
+      "daysAgo": 14
+    },
+    {
+      "id": "goal-weekly-challenge",
+      "title": "Solve a challenge every week",
+      "kind": "challenges",
+      "period": "weekly",
+      "target": 1,
+      "daysAgo": 14
+    },
+    {
+      "id": "goal-daily-reading",
+      "title": "Read for 20 minutes",
+      "kind": "custom",
+      "period": "daily",
+      "target": 1,
+      "daysAgo": 14,
+      "checkIns": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "challenges": [
+    {
+      "challengeId": "ch-debounce",
+      "status": "done",
+      "daysAgo": 4,
+      "solutionNotes": "Used a Timer per event and cancelled the previous one. Closing the controller when the source finishes was the part I missed at first."
+    },
+    {
+      "challengeId": "ch-responsive-grid",
+      "status": "inProgress",
+      "daysAgo": 2,
+      "solutionNotes": "Breakpoints at 600 and 1024."
+    }
+  ]
+}

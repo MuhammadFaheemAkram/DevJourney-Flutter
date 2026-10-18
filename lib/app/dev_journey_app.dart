@@ -1,14 +1,16 @@
 import 'package:dev_journey/core/design_system/design_system.dart';
 import 'package:dev_journey/core/navigation/app_router.dart';
-import 'package:dev_journey/core/navigation/placeholder_onboarding.dart';
+import 'package:dev_journey/core/navigation/stream_listenable.dart';
 import 'package:dev_journey/di/injection.dart';
+import 'package:dev_journey/domain/repository/settings_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The root widget: themes and the router.
 ///
-/// This `State` owns the router and disposes it. The router is created once,
-/// not in `build`: a new router on every rebuild would reset navigation.
+/// This `State` owns the router and the [StreamListenable] that lets it
+/// follow the settings, and disposes both. The router is created once, not
+/// in `build`: a new router on every rebuild would reset navigation.
 /// Phase 6 adds the app-scoped `SettingsCubit` here, above
 /// `MaterialApp.router`, for the theme mode and dynamic color.
 class DevJourneyApp extends StatefulWidget {
@@ -23,14 +25,18 @@ class DevJourneyApp extends StatefulWidget {
 }
 
 class _DevJourneyAppState extends State<DevJourneyApp> {
+  final _settings = getIt<SettingsRepository>();
+  late final _settingsChanges = StreamListenable(_settings.watch());
   late final GoRouter _router = createAppRouter(
-    onboarding: getIt<PlaceholderOnboarding>(),
+    settings: _settings,
+    refreshListenable: _settingsChanges,
     initialLocation: widget.initialLocation,
   );
 
   @override
   void dispose() {
     _router.dispose();
+    _settingsChanges.dispose();
     super.dispose();
   }
 
