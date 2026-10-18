@@ -68,3 +68,13 @@ abstract class TopicDetails with _$TopicDetails {
     required RoadmapSection section,
   }) = _TopicDetails;
 }
+
+/// A topic as a choice in a picker: its title and its roadmap's.
+@freezed
+abstract class TopicChoice with _$TopicChoice {
+  const factory TopicChoice({
+    required String id,
+    required String title,
+    required String roadmapTitle,
+  }) = _TopicChoice;
+}

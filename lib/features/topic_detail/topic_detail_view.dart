@@ -2,14 +2,15 @@ import 'package:dev_journey/core/design_system/design_system.dart';
 import 'package:dev_journey/core/navigation/app_routes.dart';
 import 'package:dev_journey/core/navigation/fallback_close_button.dart';
 import 'package:dev_journey/domain/model/learning_path.dart';
+import 'package:dev_journey/features/note_editor/open_note_editor.dart';
 import 'package:dev_journey/features/topic_detail/cubit/topic_detail_cubit.dart';
 import 'package:dev_journey/features/topic_detail/cubit/topic_detail_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// A topic: where it sits, how hard and long it is, what it teaches, and
-/// the buttons to bookmark and complete it. (Its resources and notes join
-/// in Phases 4–5.)
+/// A topic: where it sits, how hard and long it is, what it teaches, the
+/// buttons to bookmark and complete it, and the user's notes on it. (Its
+/// resources join in Phase 5.)
 class TopicDetailView extends StatelessWidget {
   const TopicDetailView({super.key});
 
@@ -166,6 +167,8 @@ class _Details extends StatelessWidget {
             ),
           ),
         ],
+        const SizedBox(height: AppSpacing.large),
+        _TopicNotes(state: state, topicId: topic.id),
       ],
     );
   }
@@ -175,4 +178,62 @@ class _Details extends StatelessWidget {
     'Today' || 'Yesterday' => label.toLowerCase(),
     _ => 'on $label',
   };
+}
+
+/// The notes on this topic, and Add note (attached to it).
+class _TopicNotes extends StatelessWidget {
+  const _TopicNotes({required this.state, required this.topicId});
+
+  final TopicDetailState state;
+  final String topicId;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text('Your notes', style: theme.textTheme.titleMedium),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => openNoteEditor(context, topicId: topicId),
+              icon: const Icon(Icons.add),
+              label: const Text('Add note'),
+            ),
+          ],
+        ),
+        if (state.notes.isEmpty)
+          Text(
+            'Nothing yet. Notes you attach to this topic show here.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          )
+        else
+          Card(
+            margin: EdgeInsets.zero,
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                for (final (index, item) in state.notes.indexed) ...[
+                  if (index > 0) const Divider(height: 1),
+                  NoteRow(
+                    item: item,
+                    now: state.now,
+                    showTopic: false,
+                    onTap: () => openNoteEditor(context, noteId: item.note.id),
+                  ),
+                ],
+              ],
+            ),
+          ),
+      ],
+    );
+  }
 }

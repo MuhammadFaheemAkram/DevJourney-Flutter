@@ -311,10 +311,16 @@ mixin $NotesRoute on GoRouteData {
 }
 
 mixin $NewNoteRoute on GoRouteData {
-  static NewNoteRoute _fromState(GoRouterState state) => const NewNoteRoute();
+  static NewNoteRoute _fromState(GoRouterState state) =>
+      NewNoteRoute(topicId: state.uri.queryParameters['topic-id']);
+
+  NewNoteRoute get _self => this as NewNoteRoute;
 
   @override
-  String get location => GoRouteData.$location('/notes/new');
+  String get location => GoRouteData.$location(
+    '/notes/new',
+    queryParams: {if (_self.topicId != null) 'topic-id': _self.topicId},
+  );
 
   @override
   void go(BuildContext context) => context.go(location);

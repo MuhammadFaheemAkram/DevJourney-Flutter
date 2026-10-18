@@ -22,6 +22,7 @@ void main() {
       stack.watchTopic,
       stack.setTopicCompleted,
       stack.bookmarkTopic,
+      stack.watchNotes,
       stack.clock,
       topicId,
     )..load();

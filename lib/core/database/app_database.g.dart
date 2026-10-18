@@ -4656,6 +4656,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final CatalogDao catalogDao = CatalogDao(this as AppDatabase);
   late final LearningDao learningDao = LearningDao(this as AppDatabase);
+  late final NotesDao notesDao = NotesDao(this as AppDatabase);
+  late final GoalsDao goalsDao = GoalsDao(this as AppDatabase);
   late final UserDataDao userDataDao = UserDataDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>

@@ -35,8 +35,8 @@ DevJourney is built in **strict, reviewable phases**. Each phase ends with:
 | 1 | Foundation: FVM project, design system base, typed routes with an onboarding gate, 5-tab shell with a navigation drawer, CI | ✅ Done |
 | 2 | Data models, drift store, the fake learning API and the catalog; Welcome | ✅ Done |
 | 3 | Roadmaps, the learning path, topics and the Dashboard | ✅ Done |
-| 4 | Notes (Markdown) and goals | ⏳ Next |
-| 5 | Challenges, resources and global search (FTS5) | |
+| 4 | Notes (Markdown) and goals | ✅ Done |
+| 5 | Challenges, resources and global search (FTS5) | ⏳ Next |
 | 6 | Analytics, settings and daily reminders | |
 | 7 | Open-source polish and final docs | |
 
@@ -78,10 +78,12 @@ Packages arrive in the phase that first needs them.
 | Time | `clock` (an injected `Clock`: "today" decides streaks, goal periods and demo dates); `intl` (`DateFormat`) | 2–3 |
 | Streams | `stream_transform` (`switchMap` to follow the active roadmap, `combineLatest` for the Dashboard) | 3 |
 | Adaptive UI | `cupertino_ui` (iOS alerts through `AlertDialog.adaptive`), `RefreshIndicator.adaptive` | 3 |
+| Markdown | [`flutter_markdown_plus`](https://pub.dev/packages/flutter_markdown_plus) (the maintained successor of `flutter_markdown`), styled from the app theme | 4 |
+| Text | `characters` (length limits that count what the user sees: "👩‍💻" is one character) | 4 |
 | Lints / CI | `flutter_lints` + strict analyzer modes; GitHub Actions | 1 |
 | Testing | `flutter_test`, `bloc_test`, `mocktail` | 1+ |
 
-Planned: FTS5 search and `bloc_concurrency` (Phase 5); a Markdown renderer (Phase 4); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
+Planned: FTS5 search and `bloc_concurrency` (Phase 5); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
 
 ---
 
@@ -222,6 +224,17 @@ There is no server. `FakeLearningService` is the app's only "remote" API:
 - **The Dashboard** follows the active roadmap with `switchMap` (choosing another swaps the query) and combines its path, the active days and the totals with `combineLatest`, so a completion anywhere updates it at once.
 - **Platform touches:** the confirmation before completing a section is a Material dialog on Android and an iOS alert on iOS (`AlertDialog.adaptive`); pull to refresh uses each platform's spinner (`RefreshIndicator.adaptive`).
 
+## 📝 How Notes and Goals Work
+
+- **Notes** are Markdown, optionally attached to a topic (`SET NULL` if the catalog ever drops it). The list is one live query, newest edit first, joined to the topic's title; search is a `LIKE` over titles and contents with `%`, `_` and `\` escaped, so "50%" finds "50%". Previews are plain text, with code blocks left out.
+- **The editor** keeps the draft in its Cubit, so the Edit and Preview tabs show the same text and the discard guard (`PopScope`) knows whether anything changed. An untouched note just closes; an empty new note is discarded rather than saved.
+- **Undo restores the same note:** deleting returns the row (`DELETE … RETURNING`), and Undo inserts it back with its id and both timestamps. A swiped row leaves the list at once (a dismissed `Dismissible` must leave the tree in the same frame); deleting from the editor closes it, and the screen underneath offers Undo.
+- **Markdown in our theme:** `flutter_markdown_plus` reads `package:flutter/material.dart`'s `Theme`, which never sees `material_ui`'s, so it would draw dark text on a dark page. The app hands it a complete style sheet built from its own theme, and a dark-mode test checks the rendered color.
+- **Goals are targets per period:** daily (today), weekly (the ISO week, Monday to Sunday) or monthly (the calendar month). Nothing is stored but the goal and its check-ins: progress is the number of topic completions, challenge completions or check-ins whose day falls in the current window, so it **resets by itself** when the window moves.
+- **Check-ins** are for custom goals only, and stop at the target (the use case refuses more). Undo removes the latest check-in of the *current* window, never an earlier one.
+- **Everything is live:** goal progress combines the goals with one `UNION ALL` of every completion and check-in, so completing a topic on a roadmap moves the topic goals, the Dashboard and the streak together.
+- **Platform touches:** the discard guard and delete confirmations are iOS alerts on iOS; the editor is a full-screen dialog (Material's counterpart of an iOS sheet).
+
 ---
 
 ## ✅ Testing
@@ -232,7 +245,8 @@ fvm dart format --output=none --set-exit-if-changed .
 fvm flutter test
 ```
 
-**251 tests** after Phase 3:
+**352 tests** after Phase 4:
+- **Notes and goals:** goal windows (ISO weeks across years, months and leap years) and progress by kind; the plain-text preview; the validation rules (grapheme counts); the notes DAO (order, search in titles and contents, **LIKE wildcards taken literally**, one topic's notes, `DELETE … RETURNING`, `SET NULL`) and the goals DAO (order, the `CHECK` on targets, the activity union, undo within the window only, `CASCADE`); both repositories (ids, times, update keeping the creation time, restore); the use cases (trimming, refusing invalid input, check-ins capped at the target, automatic goals refusing check-ins, a completion moving the goals); the Notes, editor and Goals Cubits on the real stack; their views with mocked Cubits (swipe and Undo, Preview, the discard guard, the goal sheet's bounds); `GoalCard`, `NoteRow`, the date labels; **Markdown in the theme colors, light and dark**; app flows (write, edit, swipe and Undo; a note from a topic; delete in the editor with Undo underneath; the discard guard; a goal reaching its target moving the Dashboard and the streak; a new goal; the Dashboard's notes).
 - **Learning:** the streak (today or not yet, gaps, month, year and leap-day boundaries, duplicates, future days), the recommendation, path counts; the learning DAO (the path as a tree, idempotent completion, section completion keeping earlier days, bookmarks, active days as a union, totals); the Dashboard use case with the demo worked out by hand (a 6-day streak, 7 of 12, State management next) and after completing a topic.
 - **Screens:** the Roadmaps, roadmap, topic and Dashboard Cubits on the real stack; their views with mocked Cubits; the design-system widgets, including the confirmation dialog on Android and iOS; app flows (Continue → complete → the Dashboard follows, completing a section after confirming, search and make a roadmap active, bookmarks).
 - **Data:** the catalog mapper (flattening, sources, every validation rule), the demo progress mapper (relative dates, instants, every validation rule), the bundled JSON itself, the DAOs (upsert counts, updates in place, **user data surviving a re-sync**, progress counts with zeros, `CHECK`, `SET NULL`, rollback), the fake service, the repositories (sync, re-sync, demo progress, offline, malformed content), the settings, the start use cases.
@@ -240,7 +254,7 @@ fvm flutter test
 - **Navigation:** every rule of the onboarding gate; typed locations; the app on its real DI graph (first launch, each tab, the drawer over every tab, each drawer screen and Back, Search from the app bars, the note editor as a full-screen dialog, deep links with a Close button, an unknown location).
 - **Design system:** the themes, any `ColorScheme` driving them (for dynamic color later), and WCAG AA contrast of every learning color (completed, streak, the three difficulties) on the page, cards and filled fields in both themes.
 - **The drawer:** its order, the selected tab, where each item leads.
-- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one, the section confirmation), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
+- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one with a note, the section confirmation, Notes, editing a note and its Preview, the topic picker, Goals and the goal sheet), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
 
 CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every pull request. It installs the FVM-pinned Flutter, checks that the committed generated code is up to date, then runs format, analyze and test.
 
@@ -270,6 +284,7 @@ CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every p
 - [Phase 1 — Foundation](docs/PHASE_1_SUMMARY.md)
 - [Phase 2 — Data Layer](docs/PHASE_2_SUMMARY.md)
 - [Phase 3 — Roadmaps + Topics](docs/PHASE_3_SUMMARY.md)
+- [Phase 4 — Notes + Goals](docs/PHASE_4_SUMMARY.md)
 
 ---
 

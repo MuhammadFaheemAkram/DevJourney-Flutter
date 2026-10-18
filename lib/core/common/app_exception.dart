@@ -36,6 +36,23 @@ final class NotFoundException extends AppException {
     : super("That $what doesn't exist any more.");
 }
 
+/// Input the form should have caught: the use cases check again.
+final class InvalidInputException extends AppException {
+  const InvalidInputException(super.message);
+}
+
+/// A custom goal already has all its check-ins for this period.
+final class GoalAlreadyMetException extends AppException {
+  const GoalAlreadyMetException()
+    : super('This goal is already met for now. Nice work!');
+}
+
+/// Only custom goals take check-ins: the others count completions.
+final class AutomaticGoalException extends AppException {
+  const AutomaticGoalException()
+    : super('This goal counts your completions by itself.');
+}
+
 /// Anything unexpected that isn't one of the cases above.
 final class UnknownException extends AppException {
   const UnknownException() : super('Something went wrong. Please try again.');

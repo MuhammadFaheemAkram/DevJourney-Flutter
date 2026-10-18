@@ -31,6 +31,35 @@ void main() {
     expect((summary.topicsCompleted, summary.challengesCompleted), (10, 1));
   });
 
+  test("the demo's goals, daily first, and its latest notes", () async {
+    await stack.loadDemo();
+
+    final summary = await stack.watchDashboard().first;
+
+    // This week (Monday 12 – today): two topics; this month: eight. The
+    // challenge was finished last Saturday; today has no check-in yet.
+    expect(
+      [
+        for (final p in summary.goals)
+          '${p.goal.title}: ${p.current}/${p.goal.target}',
+      ],
+      [
+        'Read for 20 minutes: 0/1',
+        'Complete 3 topics a week: 2/3',
+        'Solve a challenge every week: 0/1',
+        'Finish 10 topics this month: 8/10',
+      ],
+    );
+    expect(
+      [for (final n in summary.recentNotes) n.note.title],
+      [
+        'Interview questions to practise',
+        'Streams cheat sheet',
+        'Null safety gotchas',
+      ],
+    );
+  });
+
   test('completing a topic today moves everything at once', () async {
     await stack.loadDemo();
     final summaries = stack.watchDashboard();

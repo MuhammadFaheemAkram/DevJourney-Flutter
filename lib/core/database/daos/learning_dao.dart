@@ -121,6 +121,29 @@ class LearningDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  /// Every topic with its roadmap's title, in path order: what a note can be
+  /// attached to.
+  Stream<List<(TopicRow, String roadmapTitle)>> watchAllTopics() {
+    final query =
+        select(topics).join([
+          innerJoin(roadmaps, roadmaps.id.equalsExp(topics.roadmapId)),
+          innerJoin(
+            roadmapSections,
+            roadmapSections.id.equalsExp(topics.sectionId),
+          ),
+        ])..orderBy([
+          OrderingTerm.asc(roadmaps.sortOrder),
+          OrderingTerm.asc(roadmapSections.sortOrder),
+          OrderingTerm.asc(topics.sortOrder),
+        ]);
+    return query.watch().map(
+      (rows) => [
+        for (final row in rows)
+          (row.readTable(topics), row.readTable(roadmaps).title),
+      ],
+    );
+  }
+
   /// Marks [topicId] completed on [day]. A topic already completed keeps
   /// its first day (`INSERT OR IGNORE`): completing twice changes nothing.
   Future<void> completeTopic(

@@ -1208,4 +1208,274 @@ $RoadmapSectionCopyWith<$Res> get section {
 }
 }
 
+/// @nodoc
+mixin _$TopicChoice {
+
+ String get id; String get title; String get roadmapTitle;
+/// Create a copy of TopicChoice
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TopicChoiceCopyWith<TopicChoice> get copyWith => _$TopicChoiceCopyWithImpl<TopicChoice>(this as TopicChoice, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as TopicChoice;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TopicChoice&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.roadmapTitle, _this.roadmapTitle) || other.roadmapTitle == _this.roadmapTitle));
+}
+
+
+@override
+int get hashCode {
+  final _this = this as TopicChoice;
+  return Object.hash(runtimeType,_this.id,_this.title,_this.roadmapTitle);
+}
+
+@override
+String toString() {
+  final _this = this as TopicChoice;
+  return 'TopicChoice(id: ${_this.id}, title: ${_this.title}, roadmapTitle: ${_this.roadmapTitle})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TopicChoiceCopyWith<$Res>  {
+  factory $TopicChoiceCopyWith(TopicChoice value, $Res Function(TopicChoice) _then) = _$TopicChoiceCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title, String roadmapTitle
+});
+
+
+
+
+}
+/// @nodoc
+class _$TopicChoiceCopyWithImpl<$Res>
+    implements $TopicChoiceCopyWith<$Res> {
+  _$TopicChoiceCopyWithImpl(this._self, this._then);
+
+  final TopicChoice _self;
+  final $Res Function(TopicChoice) _then;
+
+/// Create a copy of TopicChoice
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? roadmapTitle = null,}) {
+  return _then(TopicChoice(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,roadmapTitle: null == roadmapTitle ? _self.roadmapTitle : roadmapTitle // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [TopicChoice].
+extension TopicChoicePatterns on TopicChoice {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TopicChoice value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _TopicChoice() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TopicChoice value)  $default,){
+final _that = this;
+switch (_that) {
+case _TopicChoice():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TopicChoice value)?  $default,){
+final _that = this;
+switch (_that) {
+case _TopicChoice() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String roadmapTitle)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _TopicChoice() when $default != null:
+return $default(_that.id,_that.title,_that.roadmapTitle);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String roadmapTitle)  $default,) {final _that = this;
+switch (_that) {
+case _TopicChoice():
+return $default(_that.id,_that.title,_that.roadmapTitle);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String roadmapTitle)?  $default,) {final _that = this;
+switch (_that) {
+case _TopicChoice() when $default != null:
+return $default(_that.id,_that.title,_that.roadmapTitle);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _TopicChoice implements TopicChoice {
+  const _TopicChoice({required this.id, required this.title, required this.roadmapTitle});
+  
+
+@override final  String id;
+@override final  String title;
+@override final  String roadmapTitle;
+
+/// Create a copy of TopicChoice
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TopicChoiceCopyWith<_TopicChoice> get copyWith => __$TopicChoiceCopyWithImpl<_TopicChoice>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TopicChoice&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.roadmapTitle, roadmapTitle) || other.roadmapTitle == roadmapTitle));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title,roadmapTitle);
+}
+
+@override
+String toString() {
+    return 'TopicChoice(id: $id, title: $title, roadmapTitle: $roadmapTitle)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$TopicChoiceCopyWith<$Res> implements $TopicChoiceCopyWith<$Res> {
+  factory _$TopicChoiceCopyWith(_TopicChoice value, $Res Function(_TopicChoice) _then) = __$TopicChoiceCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String title, String roadmapTitle
+});
+
+
+
+
+}
+/// @nodoc
+class __$TopicChoiceCopyWithImpl<$Res>
+    implements _$TopicChoiceCopyWith<$Res> {
+  __$TopicChoiceCopyWithImpl(this._self, this._then);
+
+  final _TopicChoice _self;
+  final $Res Function(_TopicChoice) _then;
+
+/// Create a copy of TopicChoice
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? roadmapTitle = null,}) {
+  return _then(_TopicChoice(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,roadmapTitle: null == roadmapTitle ? _self.roadmapTitle : roadmapTitle // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
 // dart format on

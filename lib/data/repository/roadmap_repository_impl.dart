@@ -34,4 +34,17 @@ class RoadmapRepositoryImpl implements RoadmapRepository {
   @override
   Stream<TopicDetails?> watchTopic(String topicId) =>
       _learning.watchTopic(topicId).map((row) => row?.toDomain());
+
+  @override
+  Stream<List<TopicChoice>> watchTopicChoices() =>
+      _learning.watchAllTopics().map(
+        (rows) => [
+          for (final (topic, roadmapTitle) in rows)
+            TopicChoice(
+              id: topic.id,
+              title: topic.title,
+              roadmapTitle: roadmapTitle,
+            ),
+        ],
+      );
 }

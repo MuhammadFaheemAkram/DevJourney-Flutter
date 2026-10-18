@@ -74,7 +74,10 @@ void main() {
         ('Roadmaps, with progress', '/roadmaps'),
         ('A learning path', '/roadmaps/flutter'),
         ('A topic to learn', '/topics/flutter-state'),
-        ('A completed topic', '/topics/flutter-streams'),
+        ('A completed topic, with a note', '/topics/flutter-streams'),
+        ('Notes, with the demo notes', '/notes'),
+        ('Editing a note', '/notes/note-streams'),
+        ('Goals, with progress', '/goals'),
       ]) {
         testWidgets(name, (tester) async {
           await open(tester, at: location, withDemoProgress: true);
@@ -87,6 +90,30 @@ void main() {
         await tester.tap(find.text('Mark section complete'));
         await tester.pumpAndSettle();
         expect(find.text('Complete "Architecture"?'), findsOneWidget);
+        await expectAccessible(tester);
+      });
+
+      testWidgets("a note's Preview", (tester) async {
+        await open(tester, at: '/notes/note-streams', withDemoProgress: true);
+        await tester.tap(find.text('Preview'));
+        await tester.pumpAndSettle();
+        expect(find.text('Always keep the `StreamSubscription`'), findsNothing);
+        await expectAccessible(tester);
+      });
+
+      testWidgets('the topic picker', (tester) async {
+        await open(tester, at: '/notes/new', withDemoProgress: true);
+        await tester.tap(find.text('None'));
+        await tester.pumpAndSettle();
+        expect(find.text('Attach to a topic'), findsOneWidget);
+        await expectAccessible(tester);
+      });
+
+      testWidgets('the goal sheet, editing a custom goal', (tester) async {
+        await open(tester, at: '/goals', withDemoProgress: true);
+        await tester.tap(find.text('Read for 20 minutes'));
+        await tester.pumpAndSettle();
+        expect(find.text('Edit goal'), findsOneWidget);
         await expectAccessible(tester);
       });
 

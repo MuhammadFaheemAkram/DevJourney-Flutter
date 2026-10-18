@@ -1,7 +1,9 @@
 import 'package:clock/clock.dart';
 import 'package:dev_journey/core/database/app_database.dart';
 import 'package:dev_journey/core/database/daos/catalog_dao.dart';
+import 'package:dev_journey/core/database/daos/goals_dao.dart';
 import 'package:dev_journey/core/database/daos/learning_dao.dart';
+import 'package:dev_journey/core/database/daos/notes_dao.dart';
 import 'package:dev_journey/core/database/daos/user_data_dao.dart';
 import 'package:dev_journey/core/storage/settings_local_data_source.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +33,12 @@ abstract class AppModule {
 
   @lazySingleton
   LearningDao learningDao(AppDatabase database) => database.learningDao;
+
+  @lazySingleton
+  NotesDao notesDao(AppDatabase database) => database.notesDao;
+
+  @lazySingleton
+  GoalsDao goalsDao(AppDatabase database) => database.goalsDao;
 
   @lazySingleton
   UserDataDao userDataDao(AppDatabase database) => database.userDataDao;

@@ -26,7 +26,7 @@ void main() {
   });
 
   TopicDetailState found(TopicItem item) => TopicDetailState(
-    today: today,
+    now: today.toDateTime(),
     status: TopicDetailStatus.found,
     details: TopicDetails(
       item: item,
@@ -91,7 +91,10 @@ void main() {
   testWidgets('a topic that is gone says so', (tester) async {
     await pump(
       tester,
-      TopicDetailState(today: today, status: TopicDetailStatus.notFound),
+      TopicDetailState(
+        now: today.toDateTime(),
+        status: TopicDetailStatus.notFound,
+      ),
     );
 
     expect(find.text('This topic no longer exists'), findsOneWidget);

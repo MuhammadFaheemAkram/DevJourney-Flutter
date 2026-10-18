@@ -14,4 +14,7 @@ abstract interface class RoadmapRepository {
   /// One topic with its roadmap, section and state, kept live; `null` if
   /// there's no such topic.
   Stream<TopicDetails?> watchTopic(String topicId);
+
+  /// Every topic, in path order, as a choice for a picker.
+  Stream<List<TopicChoice>> watchTopicChoices();
 }

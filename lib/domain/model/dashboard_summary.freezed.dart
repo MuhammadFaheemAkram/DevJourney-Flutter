@@ -15,9 +15,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DashboardSummary {
 
- LearningStreak get streak;/// The active roadmap's path; `null` if none is set (or it's gone).
+/// When it was derived: "today" for the goals, "5 min ago" for notes.
+ DateTime get now; LearningStreak get streak;/// The active roadmap's path; `null` if none is set (or it's gone).
  RoadmapPath? get activeRoadmap;/// What to learn next in the active roadmap; `null` when it's done.
- TopicItem? get nextTopic; int get topicsCompleted; int get challengesCompleted;
+ TopicItem? get nextTopic; int get topicsCompleted; int get challengesCompleted;/// The goals with their current progress: daily first, then weekly,
+/// then monthly.
+ List<GoalProgress> get goals;/// The latest edited notes (three at most).
+ List<NoteItem> get recentNotes;
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,20 +33,20 @@ $DashboardSummaryCopyWith<DashboardSummary> get copyWith => _$DashboardSummaryCo
 @override
 bool operator ==(Object other) {
   final _this = this as DashboardSummary;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardSummary&&(identical(other.streak, _this.streak) || other.streak == _this.streak)&&(identical(other.activeRoadmap, _this.activeRoadmap) || other.activeRoadmap == _this.activeRoadmap)&&(identical(other.nextTopic, _this.nextTopic) || other.nextTopic == _this.nextTopic)&&(identical(other.topicsCompleted, _this.topicsCompleted) || other.topicsCompleted == _this.topicsCompleted)&&(identical(other.challengesCompleted, _this.challengesCompleted) || other.challengesCompleted == _this.challengesCompleted));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardSummary&&(identical(other.now, _this.now) || other.now == _this.now)&&(identical(other.streak, _this.streak) || other.streak == _this.streak)&&(identical(other.activeRoadmap, _this.activeRoadmap) || other.activeRoadmap == _this.activeRoadmap)&&(identical(other.nextTopic, _this.nextTopic) || other.nextTopic == _this.nextTopic)&&(identical(other.topicsCompleted, _this.topicsCompleted) || other.topicsCompleted == _this.topicsCompleted)&&(identical(other.challengesCompleted, _this.challengesCompleted) || other.challengesCompleted == _this.challengesCompleted)&&const DeepCollectionEquality().equals(other.goals, _this.goals)&&const DeepCollectionEquality().equals(other.recentNotes, _this.recentNotes));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DashboardSummary;
-  return Object.hash(runtimeType,_this.streak,_this.activeRoadmap,_this.nextTopic,_this.topicsCompleted,_this.challengesCompleted);
+  return Object.hash(runtimeType,_this.now,_this.streak,_this.activeRoadmap,_this.nextTopic,_this.topicsCompleted,_this.challengesCompleted,const DeepCollectionEquality().hash(_this.goals),const DeepCollectionEquality().hash(_this.recentNotes));
 }
 
 @override
 String toString() {
   final _this = this as DashboardSummary;
-  return 'DashboardSummary(streak: ${_this.streak}, activeRoadmap: ${_this.activeRoadmap}, nextTopic: ${_this.nextTopic}, topicsCompleted: ${_this.topicsCompleted}, challengesCompleted: ${_this.challengesCompleted})';
+  return 'DashboardSummary(now: ${_this.now}, streak: ${_this.streak}, activeRoadmap: ${_this.activeRoadmap}, nextTopic: ${_this.nextTopic}, topicsCompleted: ${_this.topicsCompleted}, challengesCompleted: ${_this.challengesCompleted}, goals: ${_this.goals}, recentNotes: ${_this.recentNotes})';
 }
 
 
@@ -53,7 +57,7 @@ abstract mixin class $DashboardSummaryCopyWith<$Res>  {
   factory $DashboardSummaryCopyWith(DashboardSummary value, $Res Function(DashboardSummary) _then) = _$DashboardSummaryCopyWithImpl;
 @useResult
 $Res call({
- LearningStreak streak, RoadmapPath? activeRoadmap, TopicItem? nextTopic, int topicsCompleted, int challengesCompleted
+ DateTime now, LearningStreak streak, RoadmapPath? activeRoadmap, TopicItem? nextTopic, int topicsCompleted, int challengesCompleted, List<GoalProgress> goals, List<NoteItem> recentNotes
 });
 
 
@@ -70,14 +74,17 @@ class _$DashboardSummaryCopyWithImpl<$Res>
 
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? streak = null,Object? activeRoadmap = freezed,Object? nextTopic = freezed,Object? topicsCompleted = null,Object? challengesCompleted = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? now = null,Object? streak = null,Object? activeRoadmap = freezed,Object? nextTopic = freezed,Object? topicsCompleted = null,Object? challengesCompleted = null,Object? goals = null,Object? recentNotes = null,}) {
   return _then(DashboardSummary(
-streak: null == streak ? _self.streak : streak // ignore: cast_nullable_to_non_nullable
+now: null == now ? _self.now : now // ignore: cast_nullable_to_non_nullable
+as DateTime,streak: null == streak ? _self.streak : streak // ignore: cast_nullable_to_non_nullable
 as LearningStreak,activeRoadmap: freezed == activeRoadmap ? _self.activeRoadmap : activeRoadmap // ignore: cast_nullable_to_non_nullable
 as RoadmapPath?,nextTopic: freezed == nextTopic ? _self.nextTopic : nextTopic // ignore: cast_nullable_to_non_nullable
 as TopicItem?,topicsCompleted: null == topicsCompleted ? _self.topicsCompleted : topicsCompleted // ignore: cast_nullable_to_non_nullable
 as int,challengesCompleted: null == challengesCompleted ? _self.challengesCompleted : challengesCompleted // ignore: cast_nullable_to_non_nullable
-as int,
+as int,goals: null == goals ? _self.goals : goals // ignore: cast_nullable_to_non_nullable
+as List<GoalProgress>,recentNotes: null == recentNotes ? _self.recentNotes : recentNotes // ignore: cast_nullable_to_non_nullable
+as List<NoteItem>,
   ));
 }
 /// Create a copy of DashboardSummary
@@ -195,10 +202,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LearningStreak streak,  RoadmapPath? activeRoadmap,  TopicItem? nextTopic,  int topicsCompleted,  int challengesCompleted)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime now,  LearningStreak streak,  RoadmapPath? activeRoadmap,  TopicItem? nextTopic,  int topicsCompleted,  int challengesCompleted,  List<GoalProgress> goals,  List<NoteItem> recentNotes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DashboardSummary() when $default != null:
-return $default(_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCompleted,_that.challengesCompleted);case _:
+return $default(_that.now,_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCompleted,_that.challengesCompleted,_that.goals,_that.recentNotes);case _:
   return orElse();
 
 }
@@ -216,10 +223,10 @@ return $default(_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCom
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LearningStreak streak,  RoadmapPath? activeRoadmap,  TopicItem? nextTopic,  int topicsCompleted,  int challengesCompleted)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime now,  LearningStreak streak,  RoadmapPath? activeRoadmap,  TopicItem? nextTopic,  int topicsCompleted,  int challengesCompleted,  List<GoalProgress> goals,  List<NoteItem> recentNotes)  $default,) {final _that = this;
 switch (_that) {
 case _DashboardSummary():
-return $default(_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCompleted,_that.challengesCompleted);case _:
+return $default(_that.now,_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCompleted,_that.challengesCompleted,_that.goals,_that.recentNotes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -236,10 +243,10 @@ return $default(_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCom
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LearningStreak streak,  RoadmapPath? activeRoadmap,  TopicItem? nextTopic,  int topicsCompleted,  int challengesCompleted)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime now,  LearningStreak streak,  RoadmapPath? activeRoadmap,  TopicItem? nextTopic,  int topicsCompleted,  int challengesCompleted,  List<GoalProgress> goals,  List<NoteItem> recentNotes)?  $default,) {final _that = this;
 switch (_that) {
 case _DashboardSummary() when $default != null:
-return $default(_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCompleted,_that.challengesCompleted);case _:
+return $default(_that.now,_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCompleted,_that.challengesCompleted,_that.goals,_that.recentNotes);case _:
   return null;
 
 }
@@ -250,10 +257,12 @@ return $default(_that.streak,_that.activeRoadmap,_that.nextTopic,_that.topicsCom
 /// @nodoc
 
 
-class _DashboardSummary implements DashboardSummary {
-  const _DashboardSummary({required this.streak, this.activeRoadmap, this.nextTopic, required this.topicsCompleted, required this.challengesCompleted});
+class _DashboardSummary extends DashboardSummary {
+  const _DashboardSummary({required this.now, required this.streak, this.activeRoadmap, this.nextTopic, required this.topicsCompleted, required this.challengesCompleted,  List<GoalProgress> goals = const <GoalProgress>[],  List<NoteItem> recentNotes = const <NoteItem>[]}): _goals = goals,_recentNotes = recentNotes,super._();
   
 
+/// When it was derived: "today" for the goals, "5 min ago" for notes.
+@override final  DateTime now;
 @override final  LearningStreak streak;
 /// The active roadmap's path; `null` if none is set (or it's gone).
 @override final  RoadmapPath? activeRoadmap;
@@ -261,6 +270,26 @@ class _DashboardSummary implements DashboardSummary {
 @override final  TopicItem? nextTopic;
 @override final  int topicsCompleted;
 @override final  int challengesCompleted;
+/// The goals with their current progress: daily first, then weekly,
+/// then monthly.
+ final  List<GoalProgress> _goals;
+/// The goals with their current progress: daily first, then weekly,
+/// then monthly.
+@override@JsonKey() List<GoalProgress> get goals {
+  if (_goals is EqualUnmodifiableListView) return _goals;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_goals);
+}
+
+/// The latest edited notes (three at most).
+ final  List<NoteItem> _recentNotes;
+/// The latest edited notes (three at most).
+@override@JsonKey() List<NoteItem> get recentNotes {
+  if (_recentNotes is EqualUnmodifiableListView) return _recentNotes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_recentNotes);
+}
+
 
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
@@ -272,18 +301,18 @@ _$DashboardSummaryCopyWith<_DashboardSummary> get copyWith => __$DashboardSummar
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardSummary&&(identical(other.streak, streak) || other.streak == streak)&&(identical(other.activeRoadmap, activeRoadmap) || other.activeRoadmap == activeRoadmap)&&(identical(other.nextTopic, nextTopic) || other.nextTopic == nextTopic)&&(identical(other.topicsCompleted, topicsCompleted) || other.topicsCompleted == topicsCompleted)&&(identical(other.challengesCompleted, challengesCompleted) || other.challengesCompleted == challengesCompleted));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardSummary&&(identical(other.now, now) || other.now == now)&&(identical(other.streak, streak) || other.streak == streak)&&(identical(other.activeRoadmap, activeRoadmap) || other.activeRoadmap == activeRoadmap)&&(identical(other.nextTopic, nextTopic) || other.nextTopic == nextTopic)&&(identical(other.topicsCompleted, topicsCompleted) || other.topicsCompleted == topicsCompleted)&&(identical(other.challengesCompleted, challengesCompleted) || other.challengesCompleted == challengesCompleted)&&const DeepCollectionEquality().equals(other.goals, _goals)&&const DeepCollectionEquality().equals(other.recentNotes, _recentNotes));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,streak,activeRoadmap,nextTopic,topicsCompleted,challengesCompleted);
+    return Object.hash(runtimeType,now,streak,activeRoadmap,nextTopic,topicsCompleted,challengesCompleted,const DeepCollectionEquality().hash(_goals),const DeepCollectionEquality().hash(_recentNotes));
 }
 
 @override
 String toString() {
-    return 'DashboardSummary(streak: $streak, activeRoadmap: $activeRoadmap, nextTopic: $nextTopic, topicsCompleted: $topicsCompleted, challengesCompleted: $challengesCompleted)';
+    return 'DashboardSummary(now: $now, streak: $streak, activeRoadmap: $activeRoadmap, nextTopic: $nextTopic, topicsCompleted: $topicsCompleted, challengesCompleted: $challengesCompleted, goals: $goals, recentNotes: $recentNotes)';
 }
 
 
@@ -294,7 +323,7 @@ abstract mixin class _$DashboardSummaryCopyWith<$Res> implements $DashboardSumma
   factory _$DashboardSummaryCopyWith(_DashboardSummary value, $Res Function(_DashboardSummary) _then) = __$DashboardSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- LearningStreak streak, RoadmapPath? activeRoadmap, TopicItem? nextTopic, int topicsCompleted, int challengesCompleted
+ DateTime now, LearningStreak streak, RoadmapPath? activeRoadmap, TopicItem? nextTopic, int topicsCompleted, int challengesCompleted, List<GoalProgress> goals, List<NoteItem> recentNotes
 });
 
 
@@ -311,14 +340,17 @@ class __$DashboardSummaryCopyWithImpl<$Res>
 
 /// Create a copy of DashboardSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? streak = null,Object? activeRoadmap = freezed,Object? nextTopic = freezed,Object? topicsCompleted = null,Object? challengesCompleted = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? now = null,Object? streak = null,Object? activeRoadmap = freezed,Object? nextTopic = freezed,Object? topicsCompleted = null,Object? challengesCompleted = null,Object? goals = null,Object? recentNotes = null,}) {
   return _then(_DashboardSummary(
-streak: null == streak ? _self.streak : streak // ignore: cast_nullable_to_non_nullable
+now: null == now ? _self.now : now // ignore: cast_nullable_to_non_nullable
+as DateTime,streak: null == streak ? _self.streak : streak // ignore: cast_nullable_to_non_nullable
 as LearningStreak,activeRoadmap: freezed == activeRoadmap ? _self.activeRoadmap : activeRoadmap // ignore: cast_nullable_to_non_nullable
 as RoadmapPath?,nextTopic: freezed == nextTopic ? _self.nextTopic : nextTopic // ignore: cast_nullable_to_non_nullable
 as TopicItem?,topicsCompleted: null == topicsCompleted ? _self.topicsCompleted : topicsCompleted // ignore: cast_nullable_to_non_nullable
 as int,challengesCompleted: null == challengesCompleted ? _self.challengesCompleted : challengesCompleted // ignore: cast_nullable_to_non_nullable
-as int,
+as int,goals: null == goals ? _self._goals : goals // ignore: cast_nullable_to_non_nullable
+as List<GoalProgress>,recentNotes: null == recentNotes ? _self._recentNotes : recentNotes // ignore: cast_nullable_to_non_nullable
+as List<NoteItem>,
   ));
 }
 

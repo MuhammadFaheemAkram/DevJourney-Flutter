@@ -3,13 +3,14 @@ import 'package:dev_journey/core/navigation/app_routes.dart';
 import 'package:dev_journey/domain/model/dashboard_summary.dart';
 import 'package:dev_journey/domain/model/learning_path.dart';
 import 'package:dev_journey/features/dashboard/cubit/dashboard_cubit.dart';
+import 'package:dev_journey/features/note_editor/open_note_editor.dart';
 import 'package:dev_journey/features/shell/shell_drawer_scope.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The Dashboard: the streak, the active roadmap and what to learn next,
-/// and the totals. Phase 4 adds today's goals and recent notes, Phase 5
-/// recent challenges.
+/// the goals, the totals and the latest notes. Phase 5 adds recent
+/// challenges.
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
 
@@ -78,8 +79,28 @@ class _Summary extends StatelessWidget {
             ),
           ],
         ],
+        SectionHeader(
+          'Goals',
+          action: summary.goals.isEmpty
+              ? null
+              : TextButton(
+                  onPressed: () => const GoalsRoute().push<void>(context),
+                  child: const Text('See all'),
+                ),
+        ),
+        _Goals(summary: summary),
         const SectionHeader('So far'),
         _Totals(summary: summary),
+        SectionHeader(
+          'Recent notes',
+          action: summary.recentNotes.isEmpty
+              ? null
+              : TextButton(
+                  onPressed: () => const NotesRoute().push<void>(context),
+                  child: const Text('See all'),
+                ),
+        ),
+        _RecentNotes(summary: summary),
       ],
     );
   }
@@ -200,6 +221,77 @@ class _Totals extends StatelessWidget {
               )
             : Row(children: [for (final tile in tiles) Expanded(child: tile)]),
       ),
+    );
+  }
+}
+
+/// The first goals (daily first), or a way to set one.
+class _Goals extends StatelessWidget {
+  const _Goals({required this.summary});
+
+  static const shown = 3;
+
+  final DashboardSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    if (summary.goals.isEmpty) {
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.medium),
+        child: ListTile(
+          leading: const Icon(Icons.flag_outlined),
+          title: const Text('Set a goal'),
+          subtitle: const Text('A few topics a week keeps you moving.'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => const GoalsRoute().push<void>(context),
+        ),
+      );
+    }
+    return Column(
+      children: [
+        for (final progress in summary.goals.take(shown))
+          GoalCard(
+            progress: progress,
+            today: summary.today,
+            onTap: () => const GoalsRoute().push<void>(context),
+          ),
+      ],
+    );
+  }
+}
+
+/// The latest notes, or a way to write one.
+class _RecentNotes extends StatelessWidget {
+  const _RecentNotes({required this.summary});
+
+  final DashboardSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final notes = summary.recentNotes;
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.medium),
+      clipBehavior: Clip.antiAlias,
+      child: notes.isEmpty
+          ? ListTile(
+              leading: const Icon(Icons.sticky_note_2_outlined),
+              title: const Text('Write a note'),
+              subtitle: const Text('Keep what you learn, in Markdown.'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => openNoteEditor(context),
+            )
+          : Column(
+              children: [
+                for (final (index, item) in notes.indexed) ...[
+                  if (index > 0) const Divider(height: 1),
+                  NoteRow(
+                    item: item,
+                    now: summary.now,
+                    onTap: () => openNoteEditor(context, noteId: item.note.id),
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }

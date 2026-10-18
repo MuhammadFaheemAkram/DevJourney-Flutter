@@ -1,23 +1,39 @@
+import 'dart:math';
+
 import 'package:clock/clock.dart';
+import 'package:dev_journey/core/common/id_generator.dart';
 import 'package:dev_journey/core/database/app_database.dart';
 import 'package:dev_journey/core/network/asset_json_loader.dart';
 import 'package:dev_journey/core/network/fake_learning_service.dart';
 import 'package:dev_journey/core/network/learning_service.dart';
 import 'package:dev_journey/core/network/network_simulator.dart';
 import 'package:dev_journey/data/repository/catalog_repository_impl.dart';
+import 'package:dev_journey/data/repository/goals_repository_impl.dart';
+import 'package:dev_journey/data/repository/notes_repository_impl.dart';
 import 'package:dev_journey/data/repository/progress_repository_impl.dart';
 import 'package:dev_journey/data/repository/roadmap_repository_impl.dart';
 import 'package:dev_journey/domain/usecase/bookmark_topic_use_case.dart';
+import 'package:dev_journey/domain/usecase/check_in_goal_use_case.dart';
+import 'package:dev_journey/domain/usecase/delete_goal_use_case.dart';
+import 'package:dev_journey/domain/usecase/delete_note_use_case.dart';
+import 'package:dev_journey/domain/usecase/find_note_use_case.dart';
+import 'package:dev_journey/domain/usecase/restore_note_use_case.dart';
+import 'package:dev_journey/domain/usecase/save_goal_use_case.dart';
+import 'package:dev_journey/domain/usecase/save_note_use_case.dart';
 import 'package:dev_journey/domain/usecase/set_active_roadmap_use_case.dart';
 import 'package:dev_journey/domain/usecase/set_section_completed_use_case.dart';
 import 'package:dev_journey/domain/usecase/set_topic_completed_use_case.dart';
 import 'package:dev_journey/domain/usecase/start_learning_use_case.dart';
 import 'package:dev_journey/domain/usecase/start_with_demo_progress_use_case.dart';
 import 'package:dev_journey/domain/usecase/sync_catalog_use_case.dart';
+import 'package:dev_journey/domain/usecase/undo_check_in_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_dashboard_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_goal_progress_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_notes_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_roadmap_path_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_roadmaps_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_settings_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_topic_choices_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_topic_use_case.dart';
 import 'package:flutter/services.dart';
 
@@ -46,6 +62,9 @@ class DataStack {
   final AppDatabase db = newTestDatabase();
   final settings = FakeSettingsRepository();
 
+  /// Seeded, so ids repeat from run to run.
+  final ids = IdGenerator(random: Random(7));
+
   late final catalog = CatalogRepositoryImpl(
     service,
     db.catalogDao,
@@ -54,6 +73,8 @@ class DataStack {
   );
   late final roadmaps = RoadmapRepositoryImpl(db.catalogDao, db.learningDao);
   late final progress = ProgressRepositoryImpl(db.learningDao, clock);
+  late final notes = NotesRepositoryImpl(db.notesDao, ids, clock);
+  late final goals = GoalsRepositoryImpl(db.goalsDao, ids, clock);
 
   late final syncCatalog = SyncCatalogUseCase(catalog, settings);
   late final watchRoadmaps = WatchRoadmapsUseCase(roadmaps);
@@ -69,10 +90,23 @@ class DataStack {
   late final setSectionCompleted = SetSectionCompletedUseCase(progress);
   late final bookmarkTopic = BookmarkTopicUseCase(progress);
   late final setActiveRoadmap = SetActiveRoadmapUseCase(settings);
+  late final watchNotes = WatchNotesUseCase(notes);
+  late final findNote = FindNoteUseCase(notes);
+  late final saveNote = SaveNoteUseCase(notes);
+  late final deleteNote = DeleteNoteUseCase(notes);
+  late final restoreNote = RestoreNoteUseCase(notes);
+  late final watchTopicChoices = WatchTopicChoicesUseCase(roadmaps);
+  late final watchGoalProgress = WatchGoalProgressUseCase(goals, clock);
+  late final saveGoal = SaveGoalUseCase(goals);
+  late final deleteGoal = DeleteGoalUseCase(goals);
+  late final checkInGoal = CheckInGoalUseCase(goals);
+  late final undoCheckIn = UndoCheckInUseCase(goals);
   late final watchDashboard = WatchDashboardUseCase(
     settings,
     roadmaps,
     progress,
+    watchGoalProgress,
+    notes,
     clock,
   );
 

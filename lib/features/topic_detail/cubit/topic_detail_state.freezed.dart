@@ -15,7 +15,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TopicDetailState {
 
- CalendarDate get today; TopicDetailStatus get status; TopicDetails? get details;/// Why the last change failed; [errorSerial] makes each failure
+/// When the state was made: "today" for the completion, "5 min ago"
+/// for notes.
+ DateTime get now; TopicDetailStatus get status; TopicDetails? get details;/// The notes attached to this topic, newest edit first.
+ List<NoteItem> get notes;/// Why the last change failed; [errorSerial] makes each failure
 /// distinct.
  String? get errorMessage; int get errorSerial;
 /// Create a copy of TopicDetailState
@@ -29,20 +32,20 @@ $TopicDetailStateCopyWith<TopicDetailState> get copyWith => _$TopicDetailStateCo
 @override
 bool operator ==(Object other) {
   final _this = this as TopicDetailState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TopicDetailState&&(identical(other.today, _this.today) || other.today == _this.today)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.details, _this.details) || other.details == _this.details)&&(identical(other.errorMessage, _this.errorMessage) || other.errorMessage == _this.errorMessage)&&(identical(other.errorSerial, _this.errorSerial) || other.errorSerial == _this.errorSerial));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TopicDetailState&&(identical(other.now, _this.now) || other.now == _this.now)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.details, _this.details) || other.details == _this.details)&&const DeepCollectionEquality().equals(other.notes, _this.notes)&&(identical(other.errorMessage, _this.errorMessage) || other.errorMessage == _this.errorMessage)&&(identical(other.errorSerial, _this.errorSerial) || other.errorSerial == _this.errorSerial));
 }
 
 
 @override
 int get hashCode {
   final _this = this as TopicDetailState;
-  return Object.hash(runtimeType,_this.today,_this.status,_this.details,_this.errorMessage,_this.errorSerial);
+  return Object.hash(runtimeType,_this.now,_this.status,_this.details,const DeepCollectionEquality().hash(_this.notes),_this.errorMessage,_this.errorSerial);
 }
 
 @override
 String toString() {
   final _this = this as TopicDetailState;
-  return 'TopicDetailState(today: ${_this.today}, status: ${_this.status}, details: ${_this.details}, errorMessage: ${_this.errorMessage}, errorSerial: ${_this.errorSerial})';
+  return 'TopicDetailState(now: ${_this.now}, status: ${_this.status}, details: ${_this.details}, notes: ${_this.notes}, errorMessage: ${_this.errorMessage}, errorSerial: ${_this.errorSerial})';
 }
 
 
@@ -53,7 +56,7 @@ abstract mixin class $TopicDetailStateCopyWith<$Res>  {
   factory $TopicDetailStateCopyWith(TopicDetailState value, $Res Function(TopicDetailState) _then) = _$TopicDetailStateCopyWithImpl;
 @useResult
 $Res call({
- CalendarDate today, TopicDetailStatus status, TopicDetails? details, String? errorMessage, int errorSerial
+ DateTime now, TopicDetailStatus status, TopicDetails? details, List<NoteItem> notes, String? errorMessage, int errorSerial
 });
 
 
@@ -70,12 +73,13 @@ class _$TopicDetailStateCopyWithImpl<$Res>
 
 /// Create a copy of TopicDetailState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? today = null,Object? status = null,Object? details = freezed,Object? errorMessage = freezed,Object? errorSerial = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? now = null,Object? status = null,Object? details = freezed,Object? notes = null,Object? errorMessage = freezed,Object? errorSerial = null,}) {
   return _then(TopicDetailState(
-today: null == today ? _self.today : today // ignore: cast_nullable_to_non_nullable
-as CalendarDate,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+now: null == now ? _self.now : now // ignore: cast_nullable_to_non_nullable
+as DateTime,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TopicDetailStatus,details: freezed == details ? _self.details : details // ignore: cast_nullable_to_non_nullable
-as TopicDetails?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as TopicDetails?,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as List<NoteItem>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,errorSerial: null == errorSerial ? _self.errorSerial : errorSerial // ignore: cast_nullable_to_non_nullable
 as int,
   ));
@@ -174,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CalendarDate today,  TopicDetailStatus status,  TopicDetails? details,  String? errorMessage,  int errorSerial)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime now,  TopicDetailStatus status,  TopicDetails? details,  List<NoteItem> notes,  String? errorMessage,  int errorSerial)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TopicDetailState() when $default != null:
-return $default(_that.today,_that.status,_that.details,_that.errorMessage,_that.errorSerial);case _:
+return $default(_that.now,_that.status,_that.details,_that.notes,_that.errorMessage,_that.errorSerial);case _:
   return orElse();
 
 }
@@ -195,10 +199,10 @@ return $default(_that.today,_that.status,_that.details,_that.errorMessage,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CalendarDate today,  TopicDetailStatus status,  TopicDetails? details,  String? errorMessage,  int errorSerial)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime now,  TopicDetailStatus status,  TopicDetails? details,  List<NoteItem> notes,  String? errorMessage,  int errorSerial)  $default,) {final _that = this;
 switch (_that) {
 case _TopicDetailState():
-return $default(_that.today,_that.status,_that.details,_that.errorMessage,_that.errorSerial);case _:
+return $default(_that.now,_that.status,_that.details,_that.notes,_that.errorMessage,_that.errorSerial);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -215,10 +219,10 @@ return $default(_that.today,_that.status,_that.details,_that.errorMessage,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CalendarDate today,  TopicDetailStatus status,  TopicDetails? details,  String? errorMessage,  int errorSerial)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime now,  TopicDetailStatus status,  TopicDetails? details,  List<NoteItem> notes,  String? errorMessage,  int errorSerial)?  $default,) {final _that = this;
 switch (_that) {
 case _TopicDetailState() when $default != null:
-return $default(_that.today,_that.status,_that.details,_that.errorMessage,_that.errorSerial);case _:
+return $default(_that.now,_that.status,_that.details,_that.notes,_that.errorMessage,_that.errorSerial);case _:
   return null;
 
 }
@@ -229,13 +233,24 @@ return $default(_that.today,_that.status,_that.details,_that.errorMessage,_that.
 /// @nodoc
 
 
-class _TopicDetailState implements TopicDetailState {
-  const _TopicDetailState({required this.today, this.status = TopicDetailStatus.loading, this.details, this.errorMessage, this.errorSerial = 0});
+class _TopicDetailState extends TopicDetailState {
+  const _TopicDetailState({required this.now, this.status = TopicDetailStatus.loading, this.details,  List<NoteItem> notes = const <NoteItem>[], this.errorMessage, this.errorSerial = 0}): _notes = notes,super._();
   
 
-@override final  CalendarDate today;
+/// When the state was made: "today" for the completion, "5 min ago"
+/// for notes.
+@override final  DateTime now;
 @override@JsonKey() final  TopicDetailStatus status;
 @override final  TopicDetails? details;
+/// The notes attached to this topic, newest edit first.
+ final  List<NoteItem> _notes;
+/// The notes attached to this topic, newest edit first.
+@override@JsonKey() List<NoteItem> get notes {
+  if (_notes is EqualUnmodifiableListView) return _notes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_notes);
+}
+
 /// Why the last change failed; [errorSerial] makes each failure
 /// distinct.
 @override final  String? errorMessage;
@@ -251,18 +266,18 @@ _$TopicDetailStateCopyWith<_TopicDetailState> get copyWith => __$TopicDetailStat
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TopicDetailState&&(identical(other.today, today) || other.today == today)&&(identical(other.status, status) || other.status == status)&&(identical(other.details, details) || other.details == details)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.errorSerial, errorSerial) || other.errorSerial == errorSerial));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TopicDetailState&&(identical(other.now, now) || other.now == now)&&(identical(other.status, status) || other.status == status)&&(identical(other.details, details) || other.details == details)&&const DeepCollectionEquality().equals(other.notes, _notes)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.errorSerial, errorSerial) || other.errorSerial == errorSerial));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,today,status,details,errorMessage,errorSerial);
+    return Object.hash(runtimeType,now,status,details,const DeepCollectionEquality().hash(_notes),errorMessage,errorSerial);
 }
 
 @override
 String toString() {
-    return 'TopicDetailState(today: $today, status: $status, details: $details, errorMessage: $errorMessage, errorSerial: $errorSerial)';
+    return 'TopicDetailState(now: $now, status: $status, details: $details, notes: $notes, errorMessage: $errorMessage, errorSerial: $errorSerial)';
 }
 
 
@@ -273,7 +288,7 @@ abstract mixin class _$TopicDetailStateCopyWith<$Res> implements $TopicDetailSta
   factory _$TopicDetailStateCopyWith(_TopicDetailState value, $Res Function(_TopicDetailState) _then) = __$TopicDetailStateCopyWithImpl;
 @override @useResult
 $Res call({
- CalendarDate today, TopicDetailStatus status, TopicDetails? details, String? errorMessage, int errorSerial
+ DateTime now, TopicDetailStatus status, TopicDetails? details, List<NoteItem> notes, String? errorMessage, int errorSerial
 });
 
 
@@ -290,12 +305,13 @@ class __$TopicDetailStateCopyWithImpl<$Res>
 
 /// Create a copy of TopicDetailState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? today = null,Object? status = null,Object? details = freezed,Object? errorMessage = freezed,Object? errorSerial = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? now = null,Object? status = null,Object? details = freezed,Object? notes = null,Object? errorMessage = freezed,Object? errorSerial = null,}) {
   return _then(_TopicDetailState(
-today: null == today ? _self.today : today // ignore: cast_nullable_to_non_nullable
-as CalendarDate,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+now: null == now ? _self.now : now // ignore: cast_nullable_to_non_nullable
+as DateTime,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TopicDetailStatus,details: freezed == details ? _self.details : details // ignore: cast_nullable_to_non_nullable
-as TopicDetails?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as TopicDetails?,notes: null == notes ? _self._notes : notes // ignore: cast_nullable_to_non_nullable
+as List<NoteItem>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,errorSerial: null == errorSerial ? _self.errorSerial : errorSerial // ignore: cast_nullable_to_non_nullable
 as int,
   ));

@@ -46,6 +46,7 @@ void main() {
       tester,
       DashboardState(
         summary: DashboardSummary(
+          now: day.toDateTime(),
           streak: const LearningStreak(current: 3, longest: 3),
           activeRoadmap: path,
           nextTopic: path.sections.single.topics.last,
@@ -70,6 +71,7 @@ void main() {
       tester,
       DashboardState(
         summary: DashboardSummary(
+          now: day.toDateTime(),
           streak: const LearningStreak(),
           activeRoadmap: roadmapPath([
             sectionPath('basics', [topicItem('a', completedOn: day)]),
@@ -87,9 +89,10 @@ void main() {
   testWidgets('no active roadmap: a way to pick one', (tester) async {
     await pump(
       tester,
-      const DashboardState(
+      DashboardState(
         summary: DashboardSummary(
-          streak: LearningStreak(),
+          now: day.toDateTime(),
+          streak: const LearningStreak(),
           topicsCompleted: 0,
           challengesCompleted: 0,
         ),

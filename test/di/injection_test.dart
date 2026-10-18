@@ -1,10 +1,17 @@
 import 'package:dev_journey/core/database/daos/catalog_dao.dart';
+import 'package:dev_journey/core/database/daos/goals_dao.dart';
+import 'package:dev_journey/core/database/daos/notes_dao.dart';
 import 'package:dev_journey/core/database/daos/user_data_dao.dart';
 import 'package:dev_journey/core/network/learning_service.dart';
 import 'package:dev_journey/di/injection.dart';
 import 'package:dev_journey/domain/repository/catalog_repository.dart';
+import 'package:dev_journey/domain/repository/goals_repository.dart';
+import 'package:dev_journey/domain/repository/notes_repository.dart';
 import 'package:dev_journey/domain/repository/roadmap_repository.dart';
 import 'package:dev_journey/domain/repository/settings_repository.dart';
+import 'package:dev_journey/features/goals/cubit/goals_cubit.dart';
+import 'package:dev_journey/features/note_editor/cubit/note_editor_cubit.dart';
+import 'package:dev_journey/features/notes/cubit/notes_cubit.dart';
 import 'package:dev_journey/features/welcome/cubit/welcome_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,6 +35,15 @@ void main() {
     expect(getIt<UserDataDao>(), isNotNull);
     expect(getIt<CatalogRepository>(), isNotNull);
     expect(getIt<RoadmapRepository>(), isNotNull);
+    expect(getIt<NotesDao>(), isNotNull);
+    expect(getIt<GoalsDao>(), isNotNull);
+    expect(getIt<NotesRepository>(), isNotNull);
+    expect(getIt<GoalsRepository>(), isNotNull);
     await getIt<WelcomeCubit>().close();
+    await getIt<NotesCubit>().close();
+    await getIt<GoalsCubit>().close();
+    final editor = getIt<NoteEditorCubit>(param1: 'note-1');
+    expect(editor.noteId, 'note-1');
+    await editor.close();
   });
 }

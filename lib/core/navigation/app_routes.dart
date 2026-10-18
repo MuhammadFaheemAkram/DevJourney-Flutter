@@ -208,17 +208,22 @@ class NotesRoute extends GoRouteData with $NotesRoute {
   Widget build(BuildContext context, GoRouterState state) => const NotesPage();
 }
 
-/// `/notes/new`: the editor as a full-screen dialog (it slides up and has a
-/// Close button), Material's counterpart of an iOS sheet.
+/// `/notes/new`, or `/notes/new?topicId=…` from a topic: the editor as a
+/// full-screen dialog (it slides up and has a Close button), Material's
+/// counterpart of an iOS sheet.
 class NewNoteRoute extends GoRouteData with $NewNoteRoute {
-  const NewNoteRoute();
+  const NewNoteRoute({this.topicId});
+
+  /// A constructor parameter that isn't in the path becomes a query
+  /// parameter.
+  final String? topicId;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
       MaterialPage<void>(
         key: state.pageKey,
         fullscreenDialog: true,
-        child: const NoteEditorPage(),
+        child: NoteEditorPage(topicId: topicId),
       );
 }
 

@@ -20,6 +20,36 @@ extension DifficultyLabel on Difficulty {
   };
 }
 
+extension GoalKindLabel on GoalKind {
+  String get label => switch (this) {
+    GoalKind.topics => 'Complete topics',
+    GoalKind.challenges => 'Complete challenges',
+    GoalKind.custom => 'Custom',
+  };
+
+  /// What one unit of progress is: "topic", "challenge", "check-in".
+  String get unit => switch (this) {
+    GoalKind.topics => 'topic',
+    GoalKind.challenges => 'challenge',
+    GoalKind.custom => 'check-in',
+  };
+}
+
+extension GoalPeriodLabel on GoalPeriod {
+  String get label => switch (this) {
+    GoalPeriod.daily => 'Daily',
+    GoalPeriod.weekly => 'Weekly',
+    GoalPeriod.monthly => 'Monthly',
+  };
+
+  /// "today", "this week", "this month".
+  String get current => switch (this) {
+    GoalPeriod.daily => 'today',
+    GoalPeriod.weekly => 'this week',
+    GoalPeriod.monthly => 'this month',
+  };
+}
+
 /// "1 topic", "12 topics".
 String countLabel(int count, String singular, [String? plural]) =>
     '$count ${count == 1 ? singular : (plural ?? '${singular}s')}';
