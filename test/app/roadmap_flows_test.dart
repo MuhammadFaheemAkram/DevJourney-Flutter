@@ -23,7 +23,9 @@ void main() {
     await pumpDevJourney(tester, withDemoProgress: true);
 
     await tester.tapAndSettle(find.text('Continue'));
-    expect(find.text('State management'), findsOneWidget);
+    // The title, and a resource of the same name.
+    expect(find.text('State management'), findsWidgets);
+    expect(appBarTitled('Topic'), findsOneWidget);
     await tester.tap(find.text('Mark complete'));
     await tester.pumpUntilFound(find.text('Completed · tap to undo'));
     expect(find.text('Completed today'), findsOneWidget);

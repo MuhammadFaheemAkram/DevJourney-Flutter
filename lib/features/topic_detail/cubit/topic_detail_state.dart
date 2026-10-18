@@ -1,6 +1,7 @@
 import 'package:dev_journey/domain/model/calendar_date.dart';
 import 'package:dev_journey/domain/model/learning_path.dart';
 import 'package:dev_journey/domain/model/note.dart';
+import 'package:dev_journey/domain/model/resource_item.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'topic_detail_state.freezed.dart';
@@ -15,6 +16,9 @@ abstract class TopicDetailState with _$TopicDetailState {
     required DateTime now,
     @Default(TopicDetailStatus.loading) TopicDetailStatus status,
     TopicDetails? details,
+
+    /// The resources for this topic, in catalog order.
+    @Default(<ResourceItem>[]) List<ResourceItem> resources,
 
     /// The notes attached to this topic, newest edit first.
     @Default(<NoteItem>[]) List<NoteItem> notes,

@@ -22,6 +22,7 @@ void main() {
       stack.saveNote,
       stack.deleteNote,
       stack.watchTopicChoices,
+      stack.openLink,
       noteId,
       topicId,
     );
@@ -105,5 +106,19 @@ void main() {
     final cubit = await open(noteId: 'gone');
 
     expect(cubit.state.status, NoteEditorStatus.notFound);
+  });
+
+  test('a link in Preview: https opens, anything else is refused', () async {
+    final cubit = await open(noteId: 'note-interview');
+
+    await cubit.openLink('https://dart.dev/language');
+    expect(stack.links.opened, [Uri.parse('https://dart.dev/language')]);
+
+    await cubit.openLink('javascript:alert(1)');
+    expect(stack.links.opened, hasLength(1));
+    expect(
+      cubit.state.errorMessage,
+      'Only secure (https) links can be opened.',
+    );
   });
 }

@@ -79,6 +79,21 @@ void main() {
     },
   );
 
+  test('removing the topic writes the null (not "unchanged")', () async {
+    final note = added(
+      await stack.notes.addNote(
+        const NoteDraft(title: 'A', content: '', topicId: 'flutter-streams'),
+      ),
+    );
+
+    await stack.notes.updateNote(
+      note.id,
+      const NoteDraft(title: 'A', content: ''),
+    );
+
+    expect((await stack.notes.findNote(note.id))?.topicId, isNull);
+  });
+
   test('a missing note: not found', () async {
     final update = await stack.notes.updateNote(
       'nope',

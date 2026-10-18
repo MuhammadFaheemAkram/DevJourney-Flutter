@@ -9,8 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The Dashboard: the streak, the active roadmap and what to learn next,
-/// the goals, the totals and the latest notes. Phase 5 adds recent
-/// challenges.
+/// the goals, the totals, and the latest notes and challenges.
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
 
@@ -101,6 +100,34 @@ class _Summary extends StatelessWidget {
                 ),
         ),
         _RecentNotes(summary: summary),
+        SectionHeader(
+          'Recent challenges',
+          action: TextButton(
+            onPressed: () => const ChallengesRoute().go(context),
+            child: const Text('See all'),
+          ),
+        ),
+        if (summary.recentChallenges.isEmpty)
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.medium),
+            child: ListTile(
+              leading: const Icon(Icons.code),
+              title: const Text('Try a challenge'),
+              subtitle: const Text(
+                'Small exercises to practise what you learn.',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => const ChallengesRoute().go(context),
+            ),
+          )
+        else
+          for (final item in summary.recentChallenges)
+            ChallengeCard(
+              item: item,
+              onTap: () =>
+                  ChallengeDetailRoute(challengeId: item.challenge.id)
+                      .push<void>(context),
+            ),
       ],
     );
   }

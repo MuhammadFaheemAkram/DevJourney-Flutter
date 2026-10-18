@@ -53,6 +53,18 @@ final class AutomaticGoalException extends AppException {
     : super('This goal counts your completions by itself.');
 }
 
+/// Only `https` links open: anything else (http, javascript:, a file) is
+/// refused before it reaches the browser.
+final class UnsafeLinkException extends AppException {
+  const UnsafeLinkException()
+    : super('Only secure (https) links can be opened.');
+}
+
+/// The system couldn't show the link (no browser, or it refused).
+final class LinkOpenFailedException extends AppException {
+  const LinkOpenFailedException() : super("Couldn't open the link.");
+}
+
 /// Anything unexpected that isn't one of the cases above.
 final class UnknownException extends AppException {
   const UnknownException() : super('Something went wrong. Please try again.');

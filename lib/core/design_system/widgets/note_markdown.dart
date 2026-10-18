@@ -9,18 +9,22 @@ import 'package:material_ui/material_ui.dart';
 /// `package:flutter/material.dart`'s `Theme`, a different class from
 /// `material_ui`'s, so it would never find ours and would draw dark text on
 /// a dark page. Every style it uses is set here from our theme instead
-/// (conventions §11.55). Links aren't tappable yet: opening them in the
-/// in-app browser, https only, arrives with the link opener in Phase 5.
+/// (conventions §11.55). Tapping a link calls [onTapLink] with its target,
+/// as written: the caller checks it (https only) before opening it.
 class NoteMarkdown extends StatelessWidget {
-  const NoteMarkdown({super.key, required this.data});
+  const NoteMarkdown({super.key, required this.data, this.onTapLink});
 
   final String data;
+  final ValueChanged<String>? onTapLink;
 
   @override
   Widget build(BuildContext context) {
     return MarkdownBody(
       data: data,
       styleSheet: noteMarkdownStyle(Theme.of(context)),
+      onTapLink: (_, href, _) {
+        if (href != null) onTapLink?.call(href);
+      },
     );
   }
 }

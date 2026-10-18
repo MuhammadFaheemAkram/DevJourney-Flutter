@@ -5,6 +5,7 @@ import 'package:dev_journey/domain/model/calendar_date.dart';
 import 'package:dev_journey/domain/model/dashboard_summary.dart';
 import 'package:dev_journey/domain/model/learning_enums.dart';
 import 'package:dev_journey/domain/model/learning_path.dart';
+import 'package:dev_journey/domain/repository/challenges_repository.dart';
 import 'package:dev_journey/domain/repository/notes_repository.dart';
 import 'package:dev_journey/domain/repository/progress_repository.dart';
 import 'package:dev_journey/domain/repository/roadmap_repository.dart';
@@ -15,9 +16,9 @@ import 'package:stream_transform/stream_transform.dart';
 
 /// The Dashboard, kept live: the active roadmap's path (followed with
 /// `switchMap`, so choosing another roadmap swaps the query), the active
-/// days (for the streak), the completed counts, the goals' progress and the
-/// latest notes, combined with `combineLatest` and handed to the pure
-/// calculations.
+/// days (for the streak), the completed counts, the goals' progress, the
+/// latest notes and the latest challenges, combined with `combineLatest`
+/// and handed to the pure calculations.
 @injectable
 class WatchDashboardUseCase {
   const WatchDashboardUseCase(
@@ -26,6 +27,7 @@ class WatchDashboardUseCase {
     this._progress,
     this._goalProgress,
     this._notes,
+    this._challenges,
     this._clock,
   );
 
@@ -34,9 +36,11 @@ class WatchDashboardUseCase {
   final ProgressRepository _progress;
   final WatchGoalProgressUseCase _goalProgress;
   final NotesRepository _notes;
+  final ChallengesRepository _challenges;
   final Clock _clock;
 
   static const recentNotes = 3;
+  static const recentChallenges = 3;
 
   Stream<DashboardSummary> call() {
     final activePath = _settings
@@ -52,10 +56,20 @@ class WatchDashboardUseCase {
       _progress.watchActiveDays(),
       (path, days) => (path: path, days: days),
     );
-    final totals = _progress.watchCompletedCounts().combineLatest(
-      _notes.watchNotes(),
-      (counts, notes) => (counts: counts, notes: notes),
-    );
+    final totals = _progress
+        .watchCompletedCounts()
+        .combineLatest(
+          _notes.watchNotes(),
+          (counts, notes) => (counts: counts, notes: notes),
+        )
+        .combineLatest(
+          _challenges.watchRecent(limit: recentChallenges),
+          (totals, challenges) => (
+            counts: totals.counts,
+            notes: totals.notes,
+            challenges: challenges,
+          ),
+        );
     return learning
         .combineLatest(totals, (learning, totals) => (learning, totals))
         .combineLatest(_goalProgress(), (latest, goals) {
@@ -79,6 +93,7 @@ class WatchDashboardUseCase {
                 ...goals.where((progress) => progress.goal.period == period),
             ],
             recentNotes: totals.notes.take(recentNotes).toList(),
+            recentChallenges: totals.challenges,
           );
         });
   }

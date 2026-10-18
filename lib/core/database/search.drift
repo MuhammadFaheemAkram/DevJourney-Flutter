@@ -1,0 +1,103 @@
+-- Global search (schema v2): one FTS5 index over everything the user can
+-- find, kept current by triggers.
+--
+-- Why FTS5: a `LIKE '%word%'` scan can't rank, can't match word prefixes
+-- cleanly and reads every row. FTS5 keeps an inverted index of words,
+-- matches prefixes ("strea*"), ranks with bm25 and cuts snippets with the
+-- matches marked.
+--
+-- Why triggers: every write path (a catalog sync, a note saved, Undo, a
+-- reset) updates the index inside the same statement, so it can't drift
+-- from the content tables, and no repository has to remember to update it.
+-- drift reads these triggers too, so a watched search re-runs when a note
+-- changes.
+--
+-- `kind` and `ref_id` say what a row points at; they aren't searchable
+-- (UNINDEXED). `title` and `body` are; bm25 weighs the title more.
+
+import 'tables/catalog_tables.dart';
+import 'tables/user_tables.dart';
+
+CREATE VIRTUAL TABLE search_index USING fts5(
+  kind UNINDEXED,
+  ref_id UNINDEXED,
+  title,
+  body,
+  tokenize = 'unicode61 remove_diacritics 2'
+);
+
+-- Roadmaps: the title and description.
+CREATE TRIGGER search_roadmaps_insert AFTER INSERT ON roadmaps BEGIN
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('roadmap', new.id, new.title, new.description);
+END;
+CREATE TRIGGER search_roadmaps_update AFTER UPDATE ON roadmaps BEGIN
+  DELETE FROM search_index WHERE kind = 'roadmap' AND ref_id = old.id;
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('roadmap', new.id, new.title, new.description);
+END;
+CREATE TRIGGER search_roadmaps_delete AFTER DELETE ON roadmaps BEGIN
+  DELETE FROM search_index WHERE kind = 'roadmap' AND ref_id = old.id;
+END;
+
+-- Topics: the title, the description and the objectives. Objectives are
+-- stored as a JSON list; the replaces turn `["a","b"]` into `a. b` for
+-- snippets. The pairs are spelt with char() codes ([" is 91, 34): drift's
+-- parser silently dropped these triggers when they were string literals.
+CREATE TRIGGER search_topics_insert AFTER INSERT ON topics BEGIN
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('topic', new.id, new.title, new.description || ' ' ||
+      (SELECT group_concat(value, '. ') FROM json_each(new.objectives)));
+END;
+CREATE TRIGGER search_topics_update AFTER UPDATE ON topics BEGIN
+  DELETE FROM search_index WHERE kind = 'topic' AND ref_id = old.id;
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('topic', new.id, new.title, new.description || ' ' ||
+      (SELECT group_concat(value, '. ') FROM json_each(new.objectives)));
+END;
+CREATE TRIGGER search_topics_delete AFTER DELETE ON topics BEGIN
+  DELETE FROM search_index WHERE kind = 'topic' AND ref_id = old.id;
+END;
+
+-- Notes: the title and the Markdown.
+CREATE TRIGGER search_notes_insert AFTER INSERT ON notes BEGIN
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('note', new.id, new.title, new.content);
+END;
+CREATE TRIGGER search_notes_update AFTER UPDATE ON notes BEGIN
+  DELETE FROM search_index WHERE kind = 'note' AND ref_id = old.id;
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('note', new.id, new.title, new.content);
+END;
+CREATE TRIGGER search_notes_delete AFTER DELETE ON notes BEGIN
+  DELETE FROM search_index WHERE kind = 'note' AND ref_id = old.id;
+END;
+
+-- Resources: the title and where it's from ("dart.dev").
+CREATE TRIGGER search_resources_insert AFTER INSERT ON resources BEGIN
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('resource', new.id, new.title, new.source);
+END;
+CREATE TRIGGER search_resources_update AFTER UPDATE ON resources BEGIN
+  DELETE FROM search_index WHERE kind = 'resource' AND ref_id = old.id;
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('resource', new.id, new.title, new.source);
+END;
+CREATE TRIGGER search_resources_delete AFTER DELETE ON resources BEGIN
+  DELETE FROM search_index WHERE kind = 'resource' AND ref_id = old.id;
+END;
+
+-- Challenges: the title and the prompt (not the hints: searching for an
+-- answer shouldn't surface it).
+CREATE TRIGGER search_challenges_insert AFTER INSERT ON challenges BEGIN
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('challenge', new.id, new.title, new.prompt);
+END;
+CREATE TRIGGER search_challenges_update AFTER UPDATE ON challenges BEGIN
+  DELETE FROM search_index WHERE kind = 'challenge' AND ref_id = old.id;
+  INSERT INTO search_index (kind, ref_id, title, body)
+    VALUES ('challenge', new.id, new.title, new.prompt);
+END;
+CREATE TRIGGER search_challenges_delete AFTER DELETE ON challenges BEGIN
+  DELETE FROM search_index WHERE kind = 'challenge' AND ref_id = old.id;
+END;

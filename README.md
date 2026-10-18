@@ -36,8 +36,8 @@ DevJourney is built in **strict, reviewable phases**. Each phase ends with:
 | 2 | Data models, drift store, the fake learning API and the catalog; Welcome | ✅ Done |
 | 3 | Roadmaps, the learning path, topics and the Dashboard | ✅ Done |
 | 4 | Notes (Markdown) and goals | ✅ Done |
-| 5 | Challenges, resources and global search (FTS5) | ⏳ Next |
-| 6 | Analytics, settings and daily reminders | |
+| 5 | Challenges, resources and global search (FTS5) | ✅ Done |
+| 6 | Analytics, settings and daily reminders | ⏳ Next |
 | 7 | Open-source polish and final docs | |
 
 ---
@@ -71,7 +71,7 @@ Packages arrive in the phase that first needs them.
 | UI | [`material_ui`](https://pub.dev/packages/material_ui): Material 3 as a standalone package; adaptive widgets on iOS where it matters | 1 |
 | Navigation | `go_router` + `go_router_builder` (typed routes, `StatefulShellRoute`, an onboarding `redirect`) | 1 |
 | Dependency injection | `get_it` + `injectable` (a code-generated composition root) | 1 |
-| State management | `flutter_bloc`: Cubits (and, in Phase 5, one Bloc for search) | 2 |
+| State management | `flutter_bloc`: Cubits, and one Bloc (`SearchBloc`) where typing needs a debounced, restartable event stream (`bloc_concurrency`) | 2, 5 |
 | Models | `freezed` (domain models, states) + `json_serializable` (the API's DTOs, `checked: true`) | 2 |
 | Database | `drift` + `drift_flutter` (SQLite): the catalog and the user's data, with foreign keys, `CHECK` constraints, indexes and exported schema versions | 2 |
 | Preferences | `shared_preferences` (`SharedPreferencesWithCache`, loaded before `runApp`) | 2 |
@@ -80,10 +80,12 @@ Packages arrive in the phase that first needs them.
 | Adaptive UI | `cupertino_ui` (iOS alerts through `AlertDialog.adaptive`), `RefreshIndicator.adaptive` | 3 |
 | Markdown | [`flutter_markdown_plus`](https://pub.dev/packages/flutter_markdown_plus) (the maintained successor of `flutter_markdown`), styled from the app theme | 4 |
 | Text | `characters` (length limits that count what the user sees: "👩‍💻" is one character) | 4 |
+| Search | SQLite **FTS5** through drift (`search.drift`): a virtual table kept current by triggers, `bm25` ranking, `highlight()` / `snippet()` | 5 |
+| Links | `url_launcher` (`LaunchMode.inAppBrowserView`: Custom Tabs on Android, SFSafariViewController on iOS), behind a `LinkOpener` interface, https only | 5 |
 | Lints / CI | `flutter_lints` + strict analyzer modes; GitHub Actions | 1 |
-| Testing | `flutter_test`, `bloc_test`, `mocktail` | 1+ |
+| Testing | `flutter_test`, `bloc_test`, `mocktail`, `fake_async` (the search debounce in fake time) | 1+ |
 
-Planned: FTS5 search and `bloc_concurrency` (Phase 5); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
+Planned: `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
 
 ---
 
@@ -160,7 +162,9 @@ DevJourney/
 │   │   ├── navigation/             # app_routes (+ .g.dart), app_router, onboarding_redirect, stream_listenable, Close fallback
 │   │   ├── network/                # LearningService + FakeLearningService, NetworkSimulator, dto/, asset_json_loader
 │   │   ├── storage/                # settings_local_data_source (SharedPreferencesWithCache)
-│   │   ├── database/               # app_database (drift v1), converters, tables/ (catalog, user), daos/ (catalog, learning, user data)
+│   │   ├── database/               # app_database (drift v2) + .steps.dart, search.drift (FTS5 + triggers), converters, tables/,
+│   │   │                           #   daos/ (catalog, learning, notes, goals, challenges, resources, search, user data)
+│   │   ├── platform/               # UrlLauncherLinkOpener (the in-app browser)
 │   │   └── common/                 # Result, AppException, guardWrite, firstValue, IdGenerator
 │   ├── data/                       # mapper/ (the API's catalog → rows, the demo progress → rows), repository/
 │   ├── domain/                     # model/ (CalendarDate, the catalog, learning paths, streaks, the Dashboard, AppSettings),
@@ -210,6 +214,7 @@ There is no server. `FakeLearningService` is the app's only "remote" API:
 
 ## 💾 How Local Persistence Works
 
+- **Schema v2 (Phase 5)** adds the search index (see below). The upgrade from v1 is a tested `stepByStep` migration that creates the index and its triggers and indexes the rows already there; every exported version lives in [`drift_schemas/`](drift_schemas/), and the generated tests check each upgrade path ends in exactly the schema a fresh install creates.
 - **Schema v1:** the catalog (`roadmaps`, `roadmap_sections`, `topics`, `resources`, `challenges`) and the user's tables (`topic_progress`, `topic_bookmarks`, `resource_bookmarks`, `notes`, `goals`, `goal_check_ins`, `challenge_states`), keyed by catalog ids. Foreign keys are on (`PRAGMA foreign_keys = ON`), and the schema is exported to [`drift_schemas/`](drift_schemas/) from the first version.
 - **Days are `CalendarDate`s** (`yyyymmdd` integers) taken from the local clock when the action happens, so a streak counts the user's days; instants are UTC text, for ordering.
 - **Nothing derived is stored:** no percentage, count or streak column exists. Roadmap progress is a `LEFT JOIN … GROUP BY` over topics and completions, recomputed whenever either changes.
@@ -235,6 +240,20 @@ There is no server. `FakeLearningService` is the app's only "remote" API:
 - **Everything is live:** goal progress combines the goals with one `UNION ALL` of every completion and check-in, so completing a topic on a roadmap moves the topic goals, the Dashboard and the streak together.
 - **Platform touches:** the discard guard and delete confirmations are iOS alerts on iOS; the editor is a full-screen dialog (Material's counterpart of an iOS sheet).
 
+## 🔎 How Search Works
+
+- **One FTS5 index for everything** (`search.drift`): `search_index(kind, ref_id, title, body)`, where `kind` and `ref_id` say what a row points at (not searchable), and `title` and `body` are the text (a topic's description and objectives, a note's Markdown, a resource's source, a challenge's prompt; hints are left out, so searching for an answer doesn't surface it).
+- **Triggers keep it current:** every insert, update and delete on roadmaps, topics, notes, resources and challenges updates the index in the same statement, whoever writes (a sync, a note saved, Undo). drift reads the triggers too, so a watched search re-runs when a note changes.
+- **Safe queries:** `ftsQuery` turns what the user typed into an FTS5 query where each word is a quoted string (so `AND`, `NEAR`, `*`, `-`, quotes and parentheses mean nothing), all words are required, and the last one is a prefix ("strea" finds "streams").
+- **Ranked and highlighted:** `bm25` weighs a match in the title ten times one in the body; `highlight()` and `snippet()` mark the matched words, which the app splits into ranges and shows in bold (not color alone).
+- **`SearchBloc`, the one Bloc:** typing is debounced (300 ms) and **restartable**, so a newer query cancels the older one's live results. Fewer than two characters show the five recent searches (kept in preferences); opening a result remembers the query.
+- **Links open in the app, https only:** resources and links in notes go through `OpenLinkUseCase`, which refuses anything but `https` before the platform sees it, then a `LinkOpener` shows the page in Custom Tabs (Android) or SFSafariViewController (iOS).
+
+## 🧩 Challenges and Resources
+
+- **Challenges:** filter by level and status; each has a prompt, hints revealed one at a time, a status (To do → In progress → Done) and **solution notes saved as you type** (after an 800 ms pause, and at once when you leave). Done records the day: it counts for the streak and challenge goals, and moving it back clears the day.
+- **Resources:** search, type chips and **Saved only**; a bookmark toggle on each card. A topic lists its resources too.
+
 ---
 
 ## ✅ Testing
@@ -245,7 +264,8 @@ fvm dart format --output=none --set-exit-if-changed .
 fvm flutter test
 ```
 
-**352 tests** after Phase 4:
+**470 tests** after Phase 5:
+- **Search, challenges and resources:** `ftsQuery` (every FTS5 special character); highlight parsing and grouping; the search DAO (indexing on sync, prefixes, all words required, **title outranking body**, marked snippets, **the triggers on add, edit and delete**, no duplicates after a re-sync, live results, hostile text); **the v1 → v2 migration** (every path validated against a fresh schema; existing catalog rows and notes indexed; user rows kept; triggers working afterwards); the challenge and resource repositories (status transitions keeping the first start and day, notes kept across statuses, recent order, idempotent bookmarks); recent searches in preferences; the use cases (**https only**: http, `javascript:`, `file:`, `mailto:`, no host; a link the platform can't open); `SearchBloc` (the 300 ms debounce in fake time, only the last query running, the minimum length, **a newer query stopping older live results**, live results, recent searches, opening a resource); the Challenges, challenge, Resources and Topic detail Cubits on the real stack (filters, hints, **notes saved once per pause and on leaving**); their views and the Search view with mocked Cubits; the new widgets; app flows (a challenge to done with notes moving the Dashboard; save a resource and find it under Saved; search → open a note → a recent search; a new note found by search; a resource opened from search and from a topic).
 - **Notes and goals:** goal windows (ISO weeks across years, months and leap years) and progress by kind; the plain-text preview; the validation rules (grapheme counts); the notes DAO (order, search in titles and contents, **LIKE wildcards taken literally**, one topic's notes, `DELETE … RETURNING`, `SET NULL`) and the goals DAO (order, the `CHECK` on targets, the activity union, undo within the window only, `CASCADE`); both repositories (ids, times, update keeping the creation time, restore); the use cases (trimming, refusing invalid input, check-ins capped at the target, automatic goals refusing check-ins, a completion moving the goals); the Notes, editor and Goals Cubits on the real stack; their views with mocked Cubits (swipe and Undo, Preview, the discard guard, the goal sheet's bounds); `GoalCard`, `NoteRow`, the date labels; **Markdown in the theme colors, light and dark**; app flows (write, edit, swipe and Undo; a note from a topic; delete in the editor with Undo underneath; the discard guard; a goal reaching its target moving the Dashboard and the streak; a new goal; the Dashboard's notes).
 - **Learning:** the streak (today or not yet, gaps, month, year and leap-day boundaries, duplicates, future days), the recommendation, path counts; the learning DAO (the path as a tree, idempotent completion, section completion keeping earlier days, bookmarks, active days as a union, totals); the Dashboard use case with the demo worked out by hand (a 6-day streak, 7 of 12, State management next) and after completing a topic.
 - **Screens:** the Roadmaps, roadmap, topic and Dashboard Cubits on the real stack; their views with mocked Cubits; the design-system widgets, including the confirmation dialog on Android and iOS; app flows (Continue → complete → the Dashboard follows, completing a section after confirming, search and make a roadmap active, bookmarks).
@@ -254,7 +274,7 @@ fvm flutter test
 - **Navigation:** every rule of the onboarding gate; typed locations; the app on its real DI graph (first launch, each tab, the drawer over every tab, each drawer screen and Back, Search from the app bars, the note editor as a full-screen dialog, deep links with a Close button, an unknown location).
 - **Design system:** the themes, any `ColorScheme` driving them (for dynamic color later), and WCAG AA contrast of every learning color (completed, streak, the three difficulties) on the page, cards and filled fields in both themes.
 - **The drawer:** its order, the selected tab, where each item leads.
-- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one with a note, the section confirmation, Notes, editing a note and its Preview, the topic picker, Goals and the goal sheet), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
+- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one with a note, the section confirmation, Notes, editing a note and its Preview, the topic picker, Goals and the goal sheet, Challenges, a challenge with notes and one with every hint shown, Resources, Search before typing and with results), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
 
 CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every pull request. It installs the FVM-pinned Flutter, checks that the committed generated code is up to date, then runs format, analyze and test.
 
@@ -285,6 +305,7 @@ CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every p
 - [Phase 2 — Data Layer](docs/PHASE_2_SUMMARY.md)
 - [Phase 3 — Roadmaps + Topics](docs/PHASE_3_SUMMARY.md)
 - [Phase 4 — Notes + Goals](docs/PHASE_4_SUMMARY.md)
+- [Phase 5 — Challenges + Resources + Search](docs/PHASE_5_SUMMARY.md)
 
 ---
 

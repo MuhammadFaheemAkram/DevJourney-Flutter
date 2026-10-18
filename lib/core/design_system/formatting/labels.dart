@@ -20,6 +20,32 @@ extension DifficultyLabel on Difficulty {
   };
 }
 
+extension ChallengeCategoryLabel on ChallengeCategory {
+  String get label => switch (this) {
+    ChallengeCategory.dart => 'Dart',
+    ChallengeCategory.ui => 'UI',
+    ChallengeCategory.sql => 'SQL',
+    ChallengeCategory.systemDesign => 'System Design',
+  };
+}
+
+extension ChallengeStatusLabel on ChallengeStatus {
+  String get label => switch (this) {
+    ChallengeStatus.todo => 'To do',
+    ChallengeStatus.inProgress => 'In progress',
+    ChallengeStatus.done => 'Done',
+  };
+}
+
+extension ResourceTypeLabel on ResourceType {
+  String get label => switch (this) {
+    ResourceType.article => 'Article',
+    ResourceType.video => 'Video',
+    ResourceType.documentation => 'Documentation',
+    ResourceType.course => 'Course',
+  };
+}
+
 extension GoalKindLabel on GoalKind {
   String get label => switch (this) {
     GoalKind.topics => 'Complete topics',

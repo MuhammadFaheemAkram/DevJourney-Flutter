@@ -5,6 +5,321 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class SearchIndex extends Table
+    with
+        TableInfo<SearchIndex, SearchIndexData>,
+        VirtualTableInfo<SearchIndex, SearchIndexData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SearchIndex(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _refIdMeta = const VerificationMeta('refId');
+  late final GeneratedColumn<String> refId = GeneratedColumn<String>(
+    'ref_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [kind, refId, title, body];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'search_index';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SearchIndexData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('ref_id')) {
+      context.handle(
+        _refIdMeta,
+        refId.isAcceptableOrUnknown(data['ref_id']!, _refIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_refIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  SearchIndexData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SearchIndexData(
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      refId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ref_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+    );
+  }
+
+  @override
+  SearchIndex createAlias(String alias) {
+    return SearchIndex(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+  @override
+  String get moduleAndArgs =>
+      'fts5(kind UNINDEXED, ref_id UNINDEXED, title, body, tokenize = \'unicode61 remove_diacritics 2\')';
+}
+
+class SearchIndexData extends DataClass implements Insertable<SearchIndexData> {
+  final String kind;
+  final String refId;
+  final String title;
+  final String body;
+  const SearchIndexData({
+    required this.kind,
+    required this.refId,
+    required this.title,
+    required this.body,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['kind'] = Variable<String>(kind);
+    map['ref_id'] = Variable<String>(refId);
+    map['title'] = Variable<String>(title);
+    map['body'] = Variable<String>(body);
+    return map;
+  }
+
+  SearchIndexCompanion toCompanion(bool nullToAbsent) {
+    return SearchIndexCompanion(
+      kind: Value(kind),
+      refId: Value(refId),
+      title: Value(title),
+      body: Value(body),
+    );
+  }
+
+  factory SearchIndexData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SearchIndexData(
+      kind: serializer.fromJson<String>(json['kind']),
+      refId: serializer.fromJson<String>(json['ref_id']),
+      title: serializer.fromJson<String>(json['title']),
+      body: serializer.fromJson<String>(json['body']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'kind': serializer.toJson<String>(kind),
+      'ref_id': serializer.toJson<String>(refId),
+      'title': serializer.toJson<String>(title),
+      'body': serializer.toJson<String>(body),
+    };
+  }
+
+  SearchIndexData copyWith({
+    String? kind,
+    String? refId,
+    String? title,
+    String? body,
+  }) => SearchIndexData(
+    kind: kind ?? this.kind,
+    refId: refId ?? this.refId,
+    title: title ?? this.title,
+    body: body ?? this.body,
+  );
+  SearchIndexData copyWithCompanion(SearchIndexCompanion data) {
+    return SearchIndexData(
+      kind: data.kind.present ? data.kind.value : this.kind,
+      refId: data.refId.present ? data.refId.value : this.refId,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SearchIndexData(')
+          ..write('kind: $kind, ')
+          ..write('refId: $refId, ')
+          ..write('title: $title, ')
+          ..write('body: $body')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(kind, refId, title, body);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SearchIndexData &&
+          other.kind == this.kind &&
+          other.refId == this.refId &&
+          other.title == this.title &&
+          other.body == this.body);
+}
+
+class SearchIndexCompanion extends UpdateCompanion<SearchIndexData> {
+  final Value<String> kind;
+  final Value<String> refId;
+  final Value<String> title;
+  final Value<String> body;
+  final Value<int> rowid;
+  const SearchIndexCompanion({
+    this.kind = const Value.absent(),
+    this.refId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SearchIndexCompanion.insert({
+    required String kind,
+    required String refId,
+    required String title,
+    required String body,
+    this.rowid = const Value.absent(),
+  }) : kind = Value(kind),
+       refId = Value(refId),
+       title = Value(title),
+       body = Value(body);
+  static Insertable<SearchIndexData> custom({
+    Expression<String>? kind,
+    Expression<String>? refId,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (kind != null) 'kind': kind,
+      if (refId != null) 'ref_id': refId,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SearchIndexCompanion copyWith({
+    Value<String>? kind,
+    Value<String>? refId,
+    Value<String>? title,
+    Value<String>? body,
+    Value<int>? rowid,
+  }) {
+    return SearchIndexCompanion(
+      kind: kind ?? this.kind,
+      refId: refId ?? this.refId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (refId.present) {
+      map['ref_id'] = Variable<String>(refId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SearchIndexCompanion(')
+          ..write('kind: $kind, ')
+          ..write('refId: $refId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $RoadmapsTable extends Roadmaps
     with TableInfo<$RoadmapsTable, RoadmapRow> {
   @override
@@ -1265,6 +1580,417 @@ class TopicsCompanion extends UpdateCompanion<TopicRow> {
           ..write('difficulty: $difficulty, ')
           ..write('estimatedMinutes: $estimatedMinutes, ')
           ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES topics (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    topicId,
+    title,
+    content,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NoteRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NoteRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NoteRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $NotesTable createAlias(String alias) {
+    return $NotesTable(attachedDatabase, alias);
+  }
+}
+
+class NoteRow extends DataClass implements Insertable<NoteRow> {
+  final String id;
+  final String? topicId;
+  final String title;
+  final String content;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const NoteRow({
+    required this.id,
+    this.topicId,
+    required this.title,
+    required this.content,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || topicId != null) {
+      map['topic_id'] = Variable<String>(topicId);
+    }
+    map['title'] = Variable<String>(title);
+    map['content'] = Variable<String>(content);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  NotesCompanion toCompanion(bool nullToAbsent) {
+    return NotesCompanion(
+      id: Value(id),
+      topicId: topicId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(topicId),
+      title: Value(title),
+      content: Value(content),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory NoteRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NoteRow(
+      id: serializer.fromJson<String>(json['id']),
+      topicId: serializer.fromJson<String?>(json['topicId']),
+      title: serializer.fromJson<String>(json['title']),
+      content: serializer.fromJson<String>(json['content']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'topicId': serializer.toJson<String?>(topicId),
+      'title': serializer.toJson<String>(title),
+      'content': serializer.toJson<String>(content),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  NoteRow copyWith({
+    String? id,
+    Value<String?> topicId = const Value.absent(),
+    String? title,
+    String? content,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => NoteRow(
+    id: id ?? this.id,
+    topicId: topicId.present ? topicId.value : this.topicId,
+    title: title ?? this.title,
+    content: content ?? this.content,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  NoteRow copyWithCompanion(NotesCompanion data) {
+    return NoteRow(
+      id: data.id.present ? data.id.value : this.id,
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NoteRow(')
+          ..write('id: $id, ')
+          ..write('topicId: $topicId, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, topicId, title, content, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NoteRow &&
+          other.id == this.id &&
+          other.topicId == this.topicId &&
+          other.title == this.title &&
+          other.content == this.content &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class NotesCompanion extends UpdateCompanion<NoteRow> {
+  final Value<String> id;
+  final Value<String?> topicId;
+  final Value<String> title;
+  final Value<String> content;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const NotesCompanion({
+    this.id = const Value.absent(),
+    this.topicId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.content = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NotesCompanion.insert({
+    required String id,
+    this.topicId = const Value.absent(),
+    required String title,
+    required String content,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       content = Value(content),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<NoteRow> custom({
+    Expression<String>? id,
+    Expression<String>? topicId,
+    Expression<String>? title,
+    Expression<String>? content,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (topicId != null) 'topic_id': topicId,
+      if (title != null) 'title': title,
+      if (content != null) 'content': content,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NotesCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? topicId,
+    Value<String>? title,
+    Value<String>? content,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return NotesCompanion(
+      id: id ?? this.id,
+      topicId: topicId ?? this.topicId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotesCompanion(')
+          ..write('id: $id, ')
+          ..write('topicId: $topicId, ')
+          ..write('title: $title, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2989,417 +3715,6 @@ class ResourceBookmarksCompanion extends UpdateCompanion<ResourceBookmarkRow> {
   }
 }
 
-class $NotesTable extends Notes with TableInfo<$NotesTable, NoteRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $NotesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _topicIdMeta = const VerificationMeta(
-    'topicId',
-  );
-  @override
-  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
-    'topic_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES topics (id) ON DELETE SET NULL',
-    ),
-  );
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
-  @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-    'title',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _contentMeta = const VerificationMeta(
-    'content',
-  );
-  @override
-  late final GeneratedColumn<String> content = GeneratedColumn<String>(
-    'content',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    topicId,
-    title,
-    content,
-    createdAt,
-    updatedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'notes';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<NoteRow> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('topic_id')) {
-      context.handle(
-        _topicIdMeta,
-        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
-      );
-    }
-    if (data.containsKey('title')) {
-      context.handle(
-        _titleMeta,
-        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_titleMeta);
-    }
-    if (data.containsKey('content')) {
-      context.handle(
-        _contentMeta,
-        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_contentMeta);
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_updatedAtMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  NoteRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return NoteRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      topicId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}topic_id'],
-      ),
-      title: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}title'],
-      )!,
-      content: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}content'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
-    );
-  }
-
-  @override
-  $NotesTable createAlias(String alias) {
-    return $NotesTable(attachedDatabase, alias);
-  }
-}
-
-class NoteRow extends DataClass implements Insertable<NoteRow> {
-  final String id;
-  final String? topicId;
-  final String title;
-  final String content;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  const NoteRow({
-    required this.id,
-    this.topicId,
-    required this.title,
-    required this.content,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    if (!nullToAbsent || topicId != null) {
-      map['topic_id'] = Variable<String>(topicId);
-    }
-    map['title'] = Variable<String>(title);
-    map['content'] = Variable<String>(content);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
-    return map;
-  }
-
-  NotesCompanion toCompanion(bool nullToAbsent) {
-    return NotesCompanion(
-      id: Value(id),
-      topicId: topicId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(topicId),
-      title: Value(title),
-      content: Value(content),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-    );
-  }
-
-  factory NoteRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return NoteRow(
-      id: serializer.fromJson<String>(json['id']),
-      topicId: serializer.fromJson<String?>(json['topicId']),
-      title: serializer.fromJson<String>(json['title']),
-      content: serializer.fromJson<String>(json['content']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'topicId': serializer.toJson<String?>(topicId),
-      'title': serializer.toJson<String>(title),
-      'content': serializer.toJson<String>(content),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-    };
-  }
-
-  NoteRow copyWith({
-    String? id,
-    Value<String?> topicId = const Value.absent(),
-    String? title,
-    String? content,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) => NoteRow(
-    id: id ?? this.id,
-    topicId: topicId.present ? topicId.value : this.topicId,
-    title: title ?? this.title,
-    content: content ?? this.content,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
-  NoteRow copyWithCompanion(NotesCompanion data) {
-    return NoteRow(
-      id: data.id.present ? data.id.value : this.id,
-      topicId: data.topicId.present ? data.topicId.value : this.topicId,
-      title: data.title.present ? data.title.value : this.title,
-      content: data.content.present ? data.content.value : this.content,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('NoteRow(')
-          ..write('id: $id, ')
-          ..write('topicId: $topicId, ')
-          ..write('title: $title, ')
-          ..write('content: $content, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(id, topicId, title, content, createdAt, updatedAt);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is NoteRow &&
-          other.id == this.id &&
-          other.topicId == this.topicId &&
-          other.title == this.title &&
-          other.content == this.content &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
-}
-
-class NotesCompanion extends UpdateCompanion<NoteRow> {
-  final Value<String> id;
-  final Value<String?> topicId;
-  final Value<String> title;
-  final Value<String> content;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  final Value<int> rowid;
-  const NotesCompanion({
-    this.id = const Value.absent(),
-    this.topicId = const Value.absent(),
-    this.title = const Value.absent(),
-    this.content = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  NotesCompanion.insert({
-    required String id,
-    this.topicId = const Value.absent(),
-    required String title,
-    required String content,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       title = Value(title),
-       content = Value(content),
-       createdAt = Value(createdAt),
-       updatedAt = Value(updatedAt);
-  static Insertable<NoteRow> custom({
-    Expression<String>? id,
-    Expression<String>? topicId,
-    Expression<String>? title,
-    Expression<String>? content,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (topicId != null) 'topic_id': topicId,
-      if (title != null) 'title': title,
-      if (content != null) 'content': content,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  NotesCompanion copyWith({
-    Value<String>? id,
-    Value<String?>? topicId,
-    Value<String>? title,
-    Value<String>? content,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-    Value<int>? rowid,
-  }) {
-    return NotesCompanion(
-      id: id ?? this.id,
-      topicId: topicId ?? this.topicId,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (topicId.present) {
-      map['topic_id'] = Variable<String>(topicId.value);
-    }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
-    }
-    if (content.present) {
-      map['content'] = Variable<String>(content.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('NotesCompanion(')
-          ..write('id: $id, ')
-          ..write('topicId: $topicId, ')
-          ..write('title: $title, ')
-          ..write('content: $content, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $GoalsTable extends Goals with TableInfo<$GoalsTable, GoalRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -4609,34 +4924,83 @@ class ChallengeStatesCompanion extends UpdateCompanion<ChallengeStateRow> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final SearchIndex searchIndex = SearchIndex(this);
   late final $RoadmapsTable roadmaps = $RoadmapsTable(this);
+  late final Trigger searchRoadmapsInsert = Trigger(
+    'CREATE TRIGGER search_roadmaps_insert AFTER INSERT ON roadmaps BEGIN INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'roadmap\', new.id, new.title, new.description);END',
+    'search_roadmaps_insert',
+  );
+  late final Trigger searchRoadmapsUpdate = Trigger(
+    'CREATE TRIGGER search_roadmaps_update AFTER UPDATE ON roadmaps BEGIN DELETE FROM search_index WHERE kind = \'roadmap\' AND ref_id = old.id;INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'roadmap\', new.id, new.title, new.description);END',
+    'search_roadmaps_update',
+  );
+  late final Trigger searchRoadmapsDelete = Trigger(
+    'CREATE TRIGGER search_roadmaps_delete AFTER DELETE ON roadmaps BEGIN DELETE FROM search_index WHERE kind = \'roadmap\' AND ref_id = old.id;END',
+    'search_roadmaps_delete',
+  );
   late final $RoadmapSectionsTable roadmapSections = $RoadmapSectionsTable(
     this,
   );
   late final $TopicsTable topics = $TopicsTable(this);
+  late final Trigger searchTopicsInsert = Trigger(
+    'CREATE TRIGGER search_topics_insert AFTER INSERT ON topics BEGIN INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'topic\', new.id, new.title, new.description || \' \' || (SELECT group_concat(value, \'. \') FROM json_each(new.objectives)));END',
+    'search_topics_insert',
+  );
+  late final Trigger searchTopicsUpdate = Trigger(
+    'CREATE TRIGGER search_topics_update AFTER UPDATE ON topics BEGIN DELETE FROM search_index WHERE kind = \'topic\' AND ref_id = old.id;INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'topic\', new.id, new.title, new.description || \' \' || (SELECT group_concat(value, \'. \') FROM json_each(new.objectives)));END',
+    'search_topics_update',
+  );
+  late final Trigger searchTopicsDelete = Trigger(
+    'CREATE TRIGGER search_topics_delete AFTER DELETE ON topics BEGIN DELETE FROM search_index WHERE kind = \'topic\' AND ref_id = old.id;END',
+    'search_topics_delete',
+  );
+  late final $NotesTable notes = $NotesTable(this);
+  late final Trigger searchNotesInsert = Trigger(
+    'CREATE TRIGGER search_notes_insert AFTER INSERT ON notes BEGIN INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'note\', new.id, new.title, new.content);END',
+    'search_notes_insert',
+  );
+  late final Trigger searchNotesUpdate = Trigger(
+    'CREATE TRIGGER search_notes_update AFTER UPDATE ON notes BEGIN DELETE FROM search_index WHERE kind = \'note\' AND ref_id = old.id;INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'note\', new.id, new.title, new.content);END',
+    'search_notes_update',
+  );
+  late final Trigger searchNotesDelete = Trigger(
+    'CREATE TRIGGER search_notes_delete AFTER DELETE ON notes BEGIN DELETE FROM search_index WHERE kind = \'note\' AND ref_id = old.id;END',
+    'search_notes_delete',
+  );
   late final $ResourcesTable resources = $ResourcesTable(this);
+  late final Trigger searchResourcesInsert = Trigger(
+    'CREATE TRIGGER search_resources_insert AFTER INSERT ON resources BEGIN INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'resource\', new.id, new.title, new.source);END',
+    'search_resources_insert',
+  );
+  late final Trigger searchResourcesUpdate = Trigger(
+    'CREATE TRIGGER search_resources_update AFTER UPDATE ON resources BEGIN DELETE FROM search_index WHERE kind = \'resource\' AND ref_id = old.id;INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'resource\', new.id, new.title, new.source);END',
+    'search_resources_update',
+  );
+  late final Trigger searchResourcesDelete = Trigger(
+    'CREATE TRIGGER search_resources_delete AFTER DELETE ON resources BEGIN DELETE FROM search_index WHERE kind = \'resource\' AND ref_id = old.id;END',
+    'search_resources_delete',
+  );
   late final $ChallengesTable challenges = $ChallengesTable(this);
+  late final Trigger searchChallengesInsert = Trigger(
+    'CREATE TRIGGER search_challenges_insert AFTER INSERT ON challenges BEGIN INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'challenge\', new.id, new.title, new.prompt);END',
+    'search_challenges_insert',
+  );
+  late final Trigger searchChallengesUpdate = Trigger(
+    'CREATE TRIGGER search_challenges_update AFTER UPDATE ON challenges BEGIN DELETE FROM search_index WHERE kind = \'challenge\' AND ref_id = old.id;INSERT INTO search_index (kind, ref_id, title, body) VALUES (\'challenge\', new.id, new.title, new.prompt);END',
+    'search_challenges_update',
+  );
+  late final Trigger searchChallengesDelete = Trigger(
+    'CREATE TRIGGER search_challenges_delete AFTER DELETE ON challenges BEGIN DELETE FROM search_index WHERE kind = \'challenge\' AND ref_id = old.id;END',
+    'search_challenges_delete',
+  );
   late final $TopicProgressTable topicProgress = $TopicProgressTable(this);
   late final $TopicBookmarksTable topicBookmarks = $TopicBookmarksTable(this);
   late final $ResourceBookmarksTable resourceBookmarks =
       $ResourceBookmarksTable(this);
-  late final $NotesTable notes = $NotesTable(this);
   late final $GoalsTable goals = $GoalsTable(this);
   late final $GoalCheckInsTable goalCheckIns = $GoalCheckInsTable(this);
   late final $ChallengeStatesTable challengeStates = $ChallengeStatesTable(
     this,
-  );
-  late final Index sectionsByRoadmap = Index(
-    'sections_by_roadmap',
-    'CREATE INDEX sections_by_roadmap ON roadmap_sections (roadmap_id, sort_order)',
-  );
-  late final Index topicsBySection = Index(
-    'topics_by_section',
-    'CREATE INDEX topics_by_section ON topics (section_id, sort_order)',
-  );
-  late final Index topicsByRoadmap = Index(
-    'topics_by_roadmap',
-    'CREATE INDEX topics_by_roadmap ON topics (roadmap_id)',
   );
   late final Index topicProgressByDay = Index(
     'topic_progress_by_day',
@@ -4654,38 +5018,93 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'challenge_states_by_day',
     'CREATE INDEX challenge_states_by_day ON challenge_states (completed_on)',
   );
+  late final Index sectionsByRoadmap = Index(
+    'sections_by_roadmap',
+    'CREATE INDEX sections_by_roadmap ON roadmap_sections (roadmap_id, sort_order)',
+  );
+  late final Index topicsBySection = Index(
+    'topics_by_section',
+    'CREATE INDEX topics_by_section ON topics (section_id, sort_order)',
+  );
+  late final Index topicsByRoadmap = Index(
+    'topics_by_roadmap',
+    'CREATE INDEX topics_by_roadmap ON topics (roadmap_id)',
+  );
   late final CatalogDao catalogDao = CatalogDao(this as AppDatabase);
   late final LearningDao learningDao = LearningDao(this as AppDatabase);
   late final NotesDao notesDao = NotesDao(this as AppDatabase);
   late final GoalsDao goalsDao = GoalsDao(this as AppDatabase);
+  late final ChallengesDao challengesDao = ChallengesDao(this as AppDatabase);
+  late final ResourcesDao resourcesDao = ResourcesDao(this as AppDatabase);
+  late final SearchDao searchDao = SearchDao(this as AppDatabase);
   late final UserDataDao userDataDao = UserDataDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    searchIndex,
     roadmaps,
+    searchRoadmapsInsert,
+    searchRoadmapsUpdate,
+    searchRoadmapsDelete,
     roadmapSections,
     topics,
+    searchTopicsInsert,
+    searchTopicsUpdate,
+    searchTopicsDelete,
+    notes,
+    searchNotesInsert,
+    searchNotesUpdate,
+    searchNotesDelete,
     resources,
+    searchResourcesInsert,
+    searchResourcesUpdate,
+    searchResourcesDelete,
     challenges,
+    searchChallengesInsert,
+    searchChallengesUpdate,
+    searchChallengesDelete,
     topicProgress,
     topicBookmarks,
     resourceBookmarks,
-    notes,
     goals,
     goalCheckIns,
     challengeStates,
-    sectionsByRoadmap,
-    topicsBySection,
-    topicsByRoadmap,
     topicProgressByDay,
     notesByUpdate,
     checkInsByGoalDay,
     challengeStatesByDay,
+    sectionsByRoadmap,
+    topicsBySection,
+    topicsByRoadmap,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'roadmaps',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.insert)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'roadmaps',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('search_index', kind: UpdateKind.delete),
+        TableUpdate('search_index', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'roadmaps',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.delete)],
+    ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'roadmaps',
@@ -4710,9 +5129,112 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'topics',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.insert)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'topics',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('search_index', kind: UpdateKind.delete),
+        TableUpdate('search_index', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'topics',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'topics',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('notes', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'notes',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.insert)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'notes',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('search_index', kind: UpdateKind.delete),
+        TableUpdate('search_index', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'notes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'topics',
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('resources', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'resources',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.insert)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'resources',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('search_index', kind: UpdateKind.delete),
+        TableUpdate('search_index', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'resources',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'challenges',
+        limitUpdateKind: UpdateKind.insert,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.insert)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'challenges',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [
+        TableUpdate('search_index', kind: UpdateKind.delete),
+        TableUpdate('search_index', kind: UpdateKind.insert),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'challenges',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('search_index', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -4737,13 +5259,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
-        'topics',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('notes', kind: UpdateKind.update)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
         'goals',
         limitUpdateKind: UpdateKind.delete,
       ),
@@ -4762,6 +5277,193 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       const DriftDatabaseOptions(storeDateTimeAsText: true);
 }
 
+typedef $SearchIndexCreateCompanionBuilder = SearchIndexCompanion Function({
+  required String kind,
+  required String refId,
+  required String title,
+  required String body,
+  Value<int> rowid,
+});
+typedef $SearchIndexUpdateCompanionBuilder = SearchIndexCompanion Function({
+  Value<String> kind,
+  Value<String> refId,
+  Value<String> title,
+  Value<String> body,
+  Value<int> rowid,
+});
+
+class $SearchIndexFilterComposer extends Composer<_$AppDatabase, SearchIndex> {
+  $SearchIndexFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get refId => $composableBuilder(
+    column: $table.refId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $SearchIndexOrderingComposer
+    extends Composer<_$AppDatabase, SearchIndex> {
+  $SearchIndexOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get refId => $composableBuilder(
+    column: $table.refId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $SearchIndexAnnotationComposer
+    extends Composer<_$AppDatabase, SearchIndex> {
+  $SearchIndexAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get refId =>
+      $composableBuilder(column: $table.refId, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+}
+
+class $SearchIndexTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          SearchIndex,
+          SearchIndexData,
+          $SearchIndexFilterComposer,
+          $SearchIndexOrderingComposer,
+          $SearchIndexAnnotationComposer,
+          $SearchIndexCreateCompanionBuilder,
+          $SearchIndexUpdateCompanionBuilder,
+          (
+            SearchIndexData,
+            BaseReferences<_$AppDatabase, SearchIndex, SearchIndexData>,
+          ),
+          SearchIndexData,
+          PrefetchHooks Function()
+        > {
+  $SearchIndexTableManager(_$AppDatabase db, SearchIndex table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SearchIndexFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SearchIndexOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SearchIndexAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> kind = const Value.absent(),
+                Value<String> refId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SearchIndexCompanion(
+                kind: kind,
+                refId: refId,
+                title: title,
+                body: body,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String kind,
+                required String refId,
+                required String title,
+                required String body,
+                Value<int> rowid = const Value.absent(),
+              }) => SearchIndexCompanion.insert(
+                kind: kind,
+                refId: refId,
+                title: title,
+                body: body,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<SearchIndex, SearchIndexData>(table),
+                  BaseReferences<_$AppDatabase, SearchIndex, SearchIndexData>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $SearchIndexProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      SearchIndex,
+      SearchIndexData,
+      $SearchIndexFilterComposer,
+      $SearchIndexOrderingComposer,
+      $SearchIndexAnnotationComposer,
+      $SearchIndexCreateCompanionBuilder,
+      $SearchIndexUpdateCompanionBuilder,
+      (
+        SearchIndexData,
+        BaseReferences<_$AppDatabase, SearchIndex, SearchIndexData>,
+      ),
+      SearchIndexData,
+      PrefetchHooks Function()
+    >;
 typedef $$RoadmapsTableCreateCompanionBuilder = RoadmapsCompanion Function({
   required String id,
   required String title,
@@ -5617,6 +6319,25 @@ final class $$TopicsTableReferences
     );
   }
 
+  static MultiTypedResultKey<$NotesTable, List<NoteRow>> _notesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.notes,
+    aliasName: 'topics__id__notes__topic_id',
+  );
+
+  $$NotesTableProcessedTableManager get notesRefs {
+    final manager = $$NotesTableTableManager(
+      $_db,
+      $_db.notes,
+    ).filter((f) => f.topicId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_notesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$ResourcesTable, List<ResourceRow>>
   _resourcesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.resources,
@@ -5666,25 +6387,6 @@ final class $$TopicsTableReferences
     ).filter((f) => f.topicId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_topicBookmarksRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$NotesTable, List<NoteRow>> _notesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.notes,
-    aliasName: 'topics__id__notes__topic_id',
-  );
-
-  $$NotesTableProcessedTableManager get notesRefs {
-    final manager = $$NotesTableTableManager(
-      $_db,
-      $_db.notes,
-    ).filter((f) => f.topicId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_notesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5783,6 +6485,31 @@ class $$TopicsTableFilterComposer
     return composer;
   }
 
+  Expression<bool> notesRefs(
+    Expression<bool> Function($$NotesTableFilterComposer f) f,
+  ) {
+    final $$NotesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableFilterComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<bool> resourcesRefs(
     Expression<bool> Function($$ResourcesTableFilterComposer f) f,
   ) {
@@ -5849,31 +6576,6 @@ class $$TopicsTableFilterComposer
           }) => $$TopicBookmarksTableFilterComposer(
             $db: $db,
             $table: $db.topicBookmarks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> notesRefs(
-    Expression<bool> Function($$NotesTableFilterComposer f) f,
-  ) {
-    final $$NotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.notes,
-      getReferencedColumn: (t) => t.topicId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NotesTableFilterComposer(
-            $db: $db,
-            $table: $db.notes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6061,6 +6763,31 @@ class $$TopicsTableAnnotationComposer
     return composer;
   }
 
+  Expression<T> notesRefs<T extends Object>(
+    Expression<T> Function($$NotesTableAnnotationComposer a) f,
+  ) {
+    final $$NotesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notes,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.notes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> resourcesRefs<T extends Object>(
     Expression<T> Function($$ResourcesTableAnnotationComposer a) f,
   ) {
@@ -6135,31 +6862,6 @@ class $$TopicsTableAnnotationComposer
     );
     return f(composer);
   }
-
-  Expression<T> notesRefs<T extends Object>(
-    Expression<T> Function($$NotesTableAnnotationComposer a) f,
-  ) {
-    final $$NotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.notes,
-      getReferencedColumn: (t) => t.topicId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.notes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$TopicsTableTableManager
@@ -6178,10 +6880,10 @@ class $$TopicsTableTableManager
           PrefetchHooks Function({
             bool roadmapId,
             bool sectionId,
+            bool notesRefs,
             bool resourcesRefs,
             bool topicProgressRefs,
             bool topicBookmarksRefs,
-            bool notesRefs,
           })
         > {
   $$TopicsTableTableManager(_$AppDatabase db, $TopicsTable table)
@@ -6255,18 +6957,18 @@ class $$TopicsTableTableManager
               ({
                 roadmapId = false,
                 sectionId = false,
+                notesRefs = false,
                 resourcesRefs = false,
                 topicProgressRefs = false,
                 topicBookmarksRefs = false,
-                notesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
+                    if (notesRefs) db.notes,
                     if (resourcesRefs) db.resources,
                     if (topicProgressRefs) db.topicProgress,
                     if (topicBookmarksRefs) db.topicBookmarks,
-                    if (notesRefs) db.notes,
                   ],
                   addJoins:
                       <
@@ -6311,6 +7013,23 @@ class $$TopicsTableTableManager
                       },
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (notesRefs)
+                        await $_getPrefetchedData<
+                          TopicRow,
+                          $TopicsTable,
+                          NoteRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TopicsTableReferences
+                              ._notesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TopicsTableReferences(db, table, p0).notesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.topicId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (resourcesRefs)
                         await $_getPrefetchedData<
                           TopicRow,
@@ -6374,23 +7093,6 @@ class $$TopicsTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (notesRefs)
-                        await $_getPrefetchedData<
-                          TopicRow,
-                          $TopicsTable,
-                          NoteRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$TopicsTableReferences
-                              ._notesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$TopicsTableReferences(db, table, p0).notesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.topicId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
                     ];
                   },
                 );
@@ -6414,11 +7116,343 @@ typedef $$TopicsTableProcessedTableManager =
       PrefetchHooks Function({
         bool roadmapId,
         bool sectionId,
+        bool notesRefs,
         bool resourcesRefs,
         bool topicProgressRefs,
         bool topicBookmarksRefs,
-        bool notesRefs,
       })
+    >;
+typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
+  required String id,
+  Value<String?> topicId,
+  required String title,
+  required String content,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$NotesTableUpdateCompanionBuilder = NotesCompanion Function({
+  Value<String> id,
+  Value<String?> topicId,
+  Value<String> title,
+  Value<String> content,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+final class $$NotesTableReferences
+    extends BaseReferences<_$AppDatabase, $NotesTable, NoteRow> {
+  $$NotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $TopicsTable _topicIdTable(_$AppDatabase db) =>
+      db.topics.createAlias('notes__topic_id__topics__id');
+
+  $$TopicsTableProcessedTableManager? get topicId {
+    final $_column = $_itemColumn<String>('topic_id');
+    if ($_column == null) return null;
+    final manager = $$TopicsTableTableManager(
+      $_db,
+      $_db.topics,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_topicIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
+  $$NotesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TopicsTableFilterComposer get topicId {
+    final $$TopicsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topics,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicsTableFilterComposer(
+            $db: $db,
+            $table: $db.topics,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$NotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $NotesTable> {
+  $$NotesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TopicsTableOrderingComposer get topicId {
+    final $$TopicsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topics,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicsTableOrderingComposer(
+            $db: $db,
+            $table: $db.topics,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$NotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NotesTable> {
+  $$NotesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$TopicsTableAnnotationComposer get topicId {
+    final $$TopicsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topics,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.topics,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$NotesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NotesTable,
+          NoteRow,
+          $$NotesTableFilterComposer,
+          $$NotesTableOrderingComposer,
+          $$NotesTableAnnotationComposer,
+          $$NotesTableCreateCompanionBuilder,
+          $$NotesTableUpdateCompanionBuilder,
+          (NoteRow, $$NotesTableReferences),
+          NoteRow,
+          PrefetchHooks Function({bool topicId})
+        > {
+  $$NotesTableTableManager(_$AppDatabase db, $NotesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NotesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> topicId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotesCompanion(
+                id: id,
+                topicId: topicId,
+                title: title,
+                content: content,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> topicId = const Value.absent(),
+                required String title,
+                required String content,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => NotesCompanion.insert(
+                id: id,
+                topicId: topicId,
+                title: title,
+                content: content,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$NotesTable, NoteRow>(table),
+                  $$NotesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({topicId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (topicId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.topicId,
+                        referencedTable: $$NotesTableReferences._topicIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$NotesTableReferences
+                            ._topicIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$NotesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NotesTable,
+      NoteRow,
+      $$NotesTableFilterComposer,
+      $$NotesTableOrderingComposer,
+      $$NotesTableAnnotationComposer,
+      $$NotesTableCreateCompanionBuilder,
+      $$NotesTableUpdateCompanionBuilder,
+      (NoteRow, $$NotesTableReferences),
+      NoteRow,
+      PrefetchHooks Function({bool topicId})
     >;
 typedef $$ResourcesTableCreateCompanionBuilder = ResourcesCompanion Function({
   required String id,
@@ -8067,338 +9101,6 @@ typedef $$ResourceBookmarksTableProcessedTableManager =
       ResourceBookmarkRow,
       PrefetchHooks Function({bool resourceId})
     >;
-typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
-  required String id,
-  Value<String?> topicId,
-  required String title,
-  required String content,
-  required DateTime createdAt,
-  required DateTime updatedAt,
-  Value<int> rowid,
-});
-typedef $$NotesTableUpdateCompanionBuilder = NotesCompanion Function({
-  Value<String> id,
-  Value<String?> topicId,
-  Value<String> title,
-  Value<String> content,
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> rowid,
-});
-
-final class $$NotesTableReferences
-    extends BaseReferences<_$AppDatabase, $NotesTable, NoteRow> {
-  $$NotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $TopicsTable _topicIdTable(_$AppDatabase db) =>
-      db.topics.createAlias('notes__topic_id__topics__id');
-
-  $$TopicsTableProcessedTableManager? get topicId {
-    final $_column = $_itemColumn<String>('topic_id');
-    if ($_column == null) return null;
-    final manager = $$TopicsTableTableManager(
-      $_db,
-      $_db.topics,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_topicIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
-class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
-  $$NotesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get content => $composableBuilder(
-    column: $table.content,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$TopicsTableFilterComposer get topicId {
-    final $$TopicsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.topicId,
-      referencedTable: $db.topics,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TopicsTableFilterComposer(
-            $db: $db,
-            $table: $db.topics,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$NotesTableOrderingComposer
-    extends Composer<_$AppDatabase, $NotesTable> {
-  $$NotesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get content => $composableBuilder(
-    column: $table.content,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$TopicsTableOrderingComposer get topicId {
-    final $$TopicsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.topicId,
-      referencedTable: $db.topics,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TopicsTableOrderingComposer(
-            $db: $db,
-            $table: $db.topics,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$NotesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $NotesTable> {
-  $$NotesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
-
-  GeneratedColumn<String> get content =>
-      $composableBuilder(column: $table.content, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  $$TopicsTableAnnotationComposer get topicId {
-    final $$TopicsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.topicId,
-      referencedTable: $db.topics,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TopicsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.topics,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$NotesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $NotesTable,
-          NoteRow,
-          $$NotesTableFilterComposer,
-          $$NotesTableOrderingComposer,
-          $$NotesTableAnnotationComposer,
-          $$NotesTableCreateCompanionBuilder,
-          $$NotesTableUpdateCompanionBuilder,
-          (NoteRow, $$NotesTableReferences),
-          NoteRow,
-          PrefetchHooks Function({bool topicId})
-        > {
-  $$NotesTableTableManager(_$AppDatabase db, $NotesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$NotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$NotesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$NotesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String?> topicId = const Value.absent(),
-                Value<String> title = const Value.absent(),
-                Value<String> content = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => NotesCompanion(
-                id: id,
-                topicId: topicId,
-                title: title,
-                content: content,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                Value<String?> topicId = const Value.absent(),
-                required String title,
-                required String content,
-                required DateTime createdAt,
-                required DateTime updatedAt,
-                Value<int> rowid = const Value.absent(),
-              }) => NotesCompanion.insert(
-                id: id,
-                topicId: topicId,
-                title: title,
-                content: content,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable<$NotesTable, NoteRow>(table),
-                  $$NotesTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback: ({topicId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (topicId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.topicId,
-                        referencedTable: $$NotesTableReferences._topicIdTable(
-                          db,
-                        ),
-                        referencedColumn: $$NotesTableReferences
-                            ._topicIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
-        ),
-      );
-}
-
-typedef $$NotesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $NotesTable,
-      NoteRow,
-      $$NotesTableFilterComposer,
-      $$NotesTableOrderingComposer,
-      $$NotesTableAnnotationComposer,
-      $$NotesTableCreateCompanionBuilder,
-      $$NotesTableUpdateCompanionBuilder,
-      (NoteRow, $$NotesTableReferences),
-      NoteRow,
-      PrefetchHooks Function({bool topicId})
-    >;
 typedef $$GoalsTableCreateCompanionBuilder = GoalsCompanion Function({
   required String id,
   required String title,
@@ -9384,12 +10086,16 @@ typedef $$ChallengeStatesTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $SearchIndexTableManager get searchIndex =>
+      $SearchIndexTableManager(_db, _db.searchIndex);
   $$RoadmapsTableTableManager get roadmaps =>
       $$RoadmapsTableTableManager(_db, _db.roadmaps);
   $$RoadmapSectionsTableTableManager get roadmapSections =>
       $$RoadmapSectionsTableTableManager(_db, _db.roadmapSections);
   $$TopicsTableTableManager get topics =>
       $$TopicsTableTableManager(_db, _db.topics);
+  $$NotesTableTableManager get notes =>
+      $$NotesTableTableManager(_db, _db.notes);
   $$ResourcesTableTableManager get resources =>
       $$ResourcesTableTableManager(_db, _db.resources);
   $$ChallengesTableTableManager get challenges =>
@@ -9400,8 +10106,6 @@ class $AppDatabaseManager {
       $$TopicBookmarksTableTableManager(_db, _db.topicBookmarks);
   $$ResourceBookmarksTableTableManager get resourceBookmarks =>
       $$ResourceBookmarksTableTableManager(_db, _db.resourceBookmarks);
-  $$NotesTableTableManager get notes =>
-      $$NotesTableTableManager(_db, _db.notes);
   $$GoalsTableTableManager get goals =>
       $$GoalsTableTableManager(_db, _db.goals);
   $$GoalCheckInsTableTableManager get goalCheckIns =>

@@ -67,7 +67,9 @@ class GoalsView extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.medium),
-                child: _PeriodSelector(
+                child: SegmentedChoice<GoalPeriod>(
+                  values: GoalPeriod.values,
+                  labelOf: (period) => period.label,
                   selected: state.period,
                   onSelected: cubit.selectPeriod,
                 ),
@@ -99,42 +101,6 @@ class GoalsView extends StatelessWidget {
           ),
         },
       ),
-    );
-  }
-}
-
-/// Daily, Weekly, Monthly: a segmented button, or chips that wrap when
-/// large text wouldn't fit three segments across.
-class _PeriodSelector extends StatelessWidget {
-  const _PeriodSelector({required this.selected, required this.onSelected});
-
-  final GoalPeriod selected;
-  final ValueChanged<GoalPeriod> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    if (context.prefersStackedLayout) {
-      return Wrap(
-        spacing: AppSpacing.xSmall,
-        runSpacing: AppSpacing.xSmall,
-        children: [
-          for (final period in GoalPeriod.values)
-            ChoiceChip(
-              label: Text(period.label),
-              selected: period == selected,
-              onSelected: (_) => onSelected(period),
-            ),
-        ],
-      );
-    }
-    return SegmentedButton<GoalPeriod>(
-      showSelectedIcon: false,
-      segments: [
-        for (final period in GoalPeriod.values)
-          ButtonSegment(value: period, label: Text(period.label)),
-      ],
-      selected: {selected},
-      onSelectionChanged: (selection) => onSelected(selection.single),
     );
   }
 }

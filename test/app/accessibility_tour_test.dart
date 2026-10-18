@@ -78,6 +78,13 @@ void main() {
         ('Notes, with the demo notes', '/notes'),
         ('Editing a note', '/notes/note-streams'),
         ('Goals, with progress', '/goals'),
+        ('Challenges, with progress', '/challenges'),
+        (
+          'A challenge in progress, with notes',
+          '/challenges/ch-responsive-grid',
+        ),
+        ('Resources, with saved ones', '/resources'),
+        ('Search, before typing', '/search'),
       ]) {
         testWidgets(name, (tester) async {
           await open(tester, at: location, withDemoProgress: true);
@@ -114,6 +121,27 @@ void main() {
         await tester.tap(find.text('Read for 20 minutes'));
         await tester.pumpAndSettle();
         expect(find.text('Edit goal'), findsOneWidget);
+        await expectAccessible(tester);
+      });
+
+      testWidgets('a challenge with its hints shown', (tester) async {
+        await open(
+          tester,
+          at: '/challenges/ch-debounce',
+          withDemoProgress: true,
+        );
+        for (var i = 0; i < 3; i++) {
+          await tester.tap(find.textContaining('hint'));
+          await tester.pumpAndSettle();
+        }
+        expect(find.textContaining('Show'), findsNothing);
+        await expectAccessible(tester);
+      });
+
+      testWidgets('search results, grouped and highlighted', (tester) async {
+        await open(tester, at: '/search', withDemoProgress: true);
+        await tester.enterText(find.byType(TextField), 'stream');
+        await tester.pumpUntilFound(find.textContaining('results'));
         await expectAccessible(tester);
       });
 

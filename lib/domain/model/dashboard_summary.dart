@@ -1,4 +1,5 @@
 import 'package:dev_journey/domain/model/calendar_date.dart';
+import 'package:dev_journey/domain/model/challenge_item.dart';
 import 'package:dev_journey/domain/model/goal.dart';
 import 'package:dev_journey/domain/model/learning_path.dart';
 import 'package:dev_journey/domain/model/learning_streak.dart';
@@ -7,8 +8,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'dashboard_summary.freezed.dart';
 
-/// Everything the Dashboard shows, derived when it is read. Phase 5 adds
-/// recent challenges.
+/// Everything the Dashboard shows, derived when it is read.
 @freezed
 abstract class DashboardSummary with _$DashboardSummary {
   const factory DashboardSummary({
@@ -30,6 +30,9 @@ abstract class DashboardSummary with _$DashboardSummary {
 
     /// The latest edited notes (three at most).
     @Default(<NoteItem>[]) List<NoteItem> recentNotes,
+
+    /// The challenges worked on last (three at most).
+    @Default(<ChallengeItem>[]) List<ChallengeItem> recentChallenges,
   }) = _DashboardSummary;
 
   const DashboardSummary._();

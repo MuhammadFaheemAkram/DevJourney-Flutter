@@ -1,27 +1,20 @@
-import 'package:dev_journey/core/design_system/design_system.dart';
-import 'package:dev_journey/core/navigation/app_routes.dart';
-import 'package:dev_journey/core/navigation/fallback_close_button.dart';
+import 'package:dev_journey/di/injection.dart';
+import 'package:dev_journey/features/search/bloc/search_bloc.dart';
+import 'package:dev_journey/features/search/bloc/search_event.dart';
+import 'package:dev_journey/features/search/search_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Global search (from the drawer and app bars): a placeholder until Phase 5.
+/// Global search (from the drawer and app bars).
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: fallbackCloseButton(
-          context,
-          () => const DashboardRoute().go(context),
-        ),
-        title: const Text('Search'),
-      ),
-      body: const EmptyStateView(
-        icon: Icons.search,
-        title: 'Search',
-        message: 'Search across roadmaps, topics, notes, resources and challenges arrives in Phase 5.',
-      ),
+    return BlocProvider(
+      create: (_) =>
+          getIt<SearchBloc>()..add(const SearchSubscriptionRequested()),
+      child: const SearchView(),
     );
   }
 }

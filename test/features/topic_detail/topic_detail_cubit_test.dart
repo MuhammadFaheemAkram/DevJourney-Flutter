@@ -23,6 +23,9 @@ void main() {
       stack.setTopicCompleted,
       stack.bookmarkTopic,
       stack.watchNotes,
+      stack.watchResources,
+      stack.bookmarkResource,
+      stack.openLink,
       stack.clock,
       topicId,
     )..load();
@@ -66,5 +69,20 @@ void main() {
     final cubit = cubitFor('nope');
 
     await waitFor(cubit, (s) => s.status == TopicDetailStatus.notFound);
+  });
+
+  test("the topic's resources: save one, open one", () async {
+    final cubit = cubitFor('flutter-streams');
+    final state = await waitFor(cubit, (s) => s.resources.isNotEmpty);
+    final resource = state.resources.first;
+
+    await cubit.toggleResourceBookmark(resource);
+    await waitFor(
+      cubit,
+      (s) => s.resources.first.bookmarked != resource.bookmarked,
+    );
+
+    await cubit.openResource(resource);
+    expect(stack.links.opened, [resource.resource.url]);
   });
 }

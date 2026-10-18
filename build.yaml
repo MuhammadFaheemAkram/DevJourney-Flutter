@@ -8,6 +8,12 @@ targets:
           # UTC, so the text sorts in time order. Calendar days are not
           # DateTimes: they are `yyyymmdd` integers (`CalendarDate`).
           store_date_time_values_as_text: true
+          # Lets drift's SQL analyzer understand `search.drift` (schema v2):
+          # the FTS5 table (`MATCH`, `bm25()`, `highlight()`, `snippet()`)
+          # and `json_each` in the topic triggers.
+          sqlite_modules:
+            - fts5
+            - json1
           # `drift_dev make-migrations`: where the database lives, where each
           # exported schema version is kept, and where the generated
           # migration tests go.

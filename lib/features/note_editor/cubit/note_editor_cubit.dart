@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:dev_journey/core/common/app_exception.dart';
 import 'package:dev_journey/core/common/result.dart';
 import 'package:dev_journey/domain/calculation/validation.dart';
 import 'package:dev_journey/domain/model/learning_path.dart';
 import 'package:dev_journey/domain/model/note.dart';
 import 'package:dev_journey/domain/usecase/delete_note_use_case.dart';
 import 'package:dev_journey/domain/usecase/find_note_use_case.dart';
+import 'package:dev_journey/domain/usecase/open_link_use_case.dart';
 import 'package:dev_journey/domain/usecase/save_note_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_topic_choices_use_case.dart';
 import 'package:dev_journey/features/note_editor/cubit/note_editor_state.dart';
@@ -22,6 +24,7 @@ class NoteEditorCubit extends Cubit<NoteEditorState> {
     this._saveNote,
     this._deleteNote,
     this._watchTopics,
+    this._openLink,
     @factoryParam this.noteId,
     @factoryParam this.topicId,
   ) : super(const NoteEditorState());
@@ -30,6 +33,7 @@ class NoteEditorCubit extends Cubit<NoteEditorState> {
   final SaveNoteUseCase _saveNote;
   final DeleteNoteUseCase _deleteNote;
   final WatchTopicChoicesUseCase _watchTopics;
+  final OpenLinkUseCase _openLink;
   final String? noteId;
   final String? topicId;
 
@@ -122,6 +126,17 @@ class NoteEditorCubit extends Cubit<NoteEditorState> {
       case Err(:final exception):
         _fail(exception.message);
     }
+  }
+
+  /// A link tapped in Preview: opened in the in-app browser if it's
+  /// `https`, refused (with a message) if not.
+  Future<void> openLink(String href) async {
+    final url = Uri.tryParse(href);
+    final result = url == null
+        ? const Err<void>(UnsafeLinkException())
+        : await _openLink(url);
+    if (isClosed) return;
+    if (result case Err(:final exception)) _fail(exception.message);
   }
 
   void _fail(String message) => emit(

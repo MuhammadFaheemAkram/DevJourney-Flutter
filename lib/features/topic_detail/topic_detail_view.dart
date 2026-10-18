@@ -9,8 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// A topic: where it sits, how hard and long it is, what it teaches, the
-/// buttons to bookmark and complete it, and the user's notes on it. (Its
-/// resources join in Phase 5.)
+/// buttons to bookmark and complete it, its resources and the user's notes
+/// on it.
 class TopicDetailView extends StatelessWidget {
   const TopicDetailView({super.key});
 
@@ -166,6 +166,24 @@ class _Details extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
+        ],
+        if (state.resources.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.large),
+          Semantics(
+            header: true,
+            child: Text('Resources', style: theme.textTheme.titleMedium),
+          ),
+          const SizedBox(height: AppSpacing.xSmall),
+          for (final resource in state.resources)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xxSmall),
+              child: ResourceCard(
+                item: resource,
+                margin: EdgeInsets.zero,
+                onTap: () => cubit.openResource(resource),
+                onBookmark: () => cubit.toggleResourceBookmark(resource),
+              ),
+            ),
         ],
         const SizedBox(height: AppSpacing.large),
         _TopicNotes(state: state, topicId: topic.id),

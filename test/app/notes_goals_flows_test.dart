@@ -45,10 +45,15 @@ void main() {
       withDemoProgress: true,
       initialLocation: '/topics/flutter-state',
     );
-    await tester.pumpUntilFound(find.textContaining('Nothing yet'));
-
-    await tester.ensureVisible(find.text('Add note'));
+    await tester.pumpUntilFound(find.text('Mark complete'));
+    // Below the resources: a lazy list builds only what's near the screen.
+    await tester.scrollUntilVisible(
+      find.text('Add note'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
+    expect(find.textContaining('Nothing yet'), findsOneWidget);
     await tester.tapAndSettle(find.text('Add note'));
     await tester.pumpUntilFound(
       find.text('State management · Flutter Developer'),
@@ -68,8 +73,12 @@ void main() {
       withDemoProgress: true,
       initialLocation: '/topics/flutter-streams',
     );
-    await tester.pumpUntilFound(find.text('Streams cheat sheet'));
-    await tester.ensureVisible(find.text('Streams cheat sheet'));
+    await tester.pumpUntilFound(find.text('Completed · tap to undo'));
+    await tester.scrollUntilVisible(
+      find.text('Streams cheat sheet'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
 
     await tester.tapAndSettle(find.text('Streams cheat sheet'));

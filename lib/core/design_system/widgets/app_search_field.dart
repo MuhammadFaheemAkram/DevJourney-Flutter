@@ -16,6 +16,7 @@ class AppSearchField extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.onCleared,
+    this.autofocus = false,
   });
 
   final TextEditingController controller;
@@ -25,6 +26,7 @@ class AppSearchField extends StatelessWidget {
 
   /// Called after the Clear button has emptied the field.
   final VoidCallback? onCleared;
+  final bool autofocus;
 
   static const _shape = BorderRadius.all(Radius.circular(28));
 
@@ -35,6 +37,7 @@ class AppSearchField extends StatelessWidget {
       valueListenable: controller,
       builder: (context, value, _) => TextField(
         controller: controller,
+        autofocus: autofocus,
         autocorrect: false,
         textInputAction: TextInputAction.search,
         onChanged: onChanged,

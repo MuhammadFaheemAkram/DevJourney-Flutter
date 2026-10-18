@@ -17,9 +17,15 @@ class SettingsLocalDataSource {
   static const onboardedKey = 'settings.onboarded';
   static const activeRoadmapKey = 'settings.activeRoadmapId';
   static const catalogVersionKey = 'settings.catalogVersion';
+  static const recentSearchesKey = 'search.recent';
 
   /// The only keys the cache loads and allows writing.
-  static const allowList = {onboardedKey, activeRoadmapKey, catalogVersionKey};
+  static const allowList = {
+    onboardedKey,
+    activeRoadmapKey,
+    catalogVersionKey,
+    recentSearchesKey,
+  };
 
   final SharedPreferencesWithCache _preferences;
 
@@ -29,6 +35,9 @@ class SettingsLocalDataSource {
 
   int? get catalogVersion => _preferences.getInt(catalogVersionKey);
 
+  List<String>? get recentSearches =>
+      _preferences.getStringList(recentSearchesKey);
+
   Future<void> setOnboarded({required bool onboarded}) =>
       _preferences.setBool(onboardedKey, onboarded);
 
@@ -37,4 +46,7 @@ class SettingsLocalDataSource {
 
   Future<void> setCatalogVersion(int version) =>
       _preferences.setInt(catalogVersionKey, version);
+
+  Future<void> setRecentSearches(List<String> searches) =>
+      _preferences.setStringList(recentSearchesKey, searches);
 }

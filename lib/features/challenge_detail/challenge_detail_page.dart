@@ -1,9 +1,10 @@
-import 'package:dev_journey/core/design_system/design_system.dart';
-import 'package:dev_journey/core/navigation/app_routes.dart';
-import 'package:dev_journey/core/navigation/fallback_close_button.dart';
+import 'package:dev_journey/di/injection.dart';
+import 'package:dev_journey/features/challenge_detail/challenge_detail_view.dart';
+import 'package:dev_journey/features/challenge_detail/cubit/challenge_detail_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// One challenge ([challengeId]): a placeholder until Phase 5.
+/// One challenge ([challengeId]).
 class ChallengeDetailPage extends StatelessWidget {
   const ChallengeDetailPage({super.key, required this.challengeId});
 
@@ -11,20 +12,9 @@ class ChallengeDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: fallbackCloseButton(
-          context,
-          () => const ChallengesRoute().go(context),
-        ),
-        title: const Text('Challenge'),
-      ),
-      body: const EmptyStateView(
-        icon: Icons.code_outlined,
-        title: 'Challenge',
-        message:
-            'A challenge, its hints and your solution notes arrive in Phase 5.',
-      ),
+    return BlocProvider(
+      create: (_) => getIt<ChallengeDetailCubit>(param1: challengeId)..load(),
+      child: const ChallengeDetailView(),
     );
   }
 }

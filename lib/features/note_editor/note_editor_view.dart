@@ -250,7 +250,10 @@ class _PreviewTab extends StatelessWidget {
           Text(title, style: theme.textTheme.headlineSmall),
           const SizedBox(height: AppSpacing.medium),
         ],
-        NoteMarkdown(data: draft.content),
+        NoteMarkdown(
+          data: draft.content,
+          onTapLink: context.read<NoteEditorCubit>().openLink,
+        ),
       ],
     );
   }

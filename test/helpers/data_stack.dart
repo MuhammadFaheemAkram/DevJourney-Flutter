@@ -8,37 +8,54 @@ import 'package:dev_journey/core/network/fake_learning_service.dart';
 import 'package:dev_journey/core/network/learning_service.dart';
 import 'package:dev_journey/core/network/network_simulator.dart';
 import 'package:dev_journey/data/repository/catalog_repository_impl.dart';
+import 'package:dev_journey/data/repository/challenges_repository_impl.dart';
 import 'package:dev_journey/data/repository/goals_repository_impl.dart';
 import 'package:dev_journey/data/repository/notes_repository_impl.dart';
 import 'package:dev_journey/data/repository/progress_repository_impl.dart';
+import 'package:dev_journey/data/repository/resources_repository_impl.dart';
 import 'package:dev_journey/data/repository/roadmap_repository_impl.dart';
+import 'package:dev_journey/data/repository/search_repository_impl.dart';
+import 'package:dev_journey/domain/usecase/bookmark_resource_use_case.dart';
 import 'package:dev_journey/domain/usecase/bookmark_topic_use_case.dart';
 import 'package:dev_journey/domain/usecase/check_in_goal_use_case.dart';
+import 'package:dev_journey/domain/usecase/clear_recent_searches_use_case.dart';
 import 'package:dev_journey/domain/usecase/delete_goal_use_case.dart';
 import 'package:dev_journey/domain/usecase/delete_note_use_case.dart';
 import 'package:dev_journey/domain/usecase/find_note_use_case.dart';
+import 'package:dev_journey/domain/usecase/open_link_use_case.dart';
+import 'package:dev_journey/domain/usecase/open_resource_use_case.dart';
 import 'package:dev_journey/domain/usecase/restore_note_use_case.dart';
 import 'package:dev_journey/domain/usecase/save_goal_use_case.dart';
 import 'package:dev_journey/domain/usecase/save_note_use_case.dart';
+import 'package:dev_journey/domain/usecase/save_recent_search_use_case.dart';
+import 'package:dev_journey/domain/usecase/save_solution_notes_use_case.dart';
 import 'package:dev_journey/domain/usecase/set_active_roadmap_use_case.dart';
+import 'package:dev_journey/domain/usecase/set_challenge_status_use_case.dart';
 import 'package:dev_journey/domain/usecase/set_section_completed_use_case.dart';
 import 'package:dev_journey/domain/usecase/set_topic_completed_use_case.dart';
 import 'package:dev_journey/domain/usecase/start_learning_use_case.dart';
 import 'package:dev_journey/domain/usecase/start_with_demo_progress_use_case.dart';
 import 'package:dev_journey/domain/usecase/sync_catalog_use_case.dart';
 import 'package:dev_journey/domain/usecase/undo_check_in_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_challenge_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_challenges_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_dashboard_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_goal_progress_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_notes_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_recent_searches_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_resources_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_roadmap_path_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_roadmaps_use_case.dart';
+import 'package:dev_journey/domain/usecase/watch_search_results_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_settings_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_topic_choices_use_case.dart';
 import 'package:dev_journey/domain/usecase/watch_topic_use_case.dart';
 import 'package:flutter/services.dart';
 
 import 'database.dart';
+import 'fakes/fake_recent_searches_repository.dart';
 import 'fakes/fake_settings_repository.dart';
+import 'fakes/recording_link_opener.dart';
 import 'test_dependencies.dart';
 
 /// The real repositories and use cases on an in-memory database, with a
@@ -61,6 +78,8 @@ class DataStack {
   final LearningService service;
   final AppDatabase db = newTestDatabase();
   final settings = FakeSettingsRepository();
+  final recentSearches = FakeRecentSearchesRepository();
+  final links = RecordingLinkOpener();
 
   /// Seeded, so ids repeat from run to run.
   final ids = IdGenerator(random: Random(7));
@@ -75,6 +94,9 @@ class DataStack {
   late final progress = ProgressRepositoryImpl(db.learningDao, clock);
   late final notes = NotesRepositoryImpl(db.notesDao, ids, clock);
   late final goals = GoalsRepositoryImpl(db.goalsDao, ids, clock);
+  late final challenges = ChallengesRepositoryImpl(db.challengesDao, clock);
+  late final resources = ResourcesRepositoryImpl(db.resourcesDao, clock);
+  late final search = SearchRepositoryImpl(db.searchDao);
 
   late final syncCatalog = SyncCatalogUseCase(catalog, settings);
   late final watchRoadmaps = WatchRoadmapsUseCase(roadmaps);
@@ -101,12 +123,25 @@ class DataStack {
   late final deleteGoal = DeleteGoalUseCase(goals);
   late final checkInGoal = CheckInGoalUseCase(goals);
   late final undoCheckIn = UndoCheckInUseCase(goals);
+  late final watchChallenges = WatchChallengesUseCase(challenges);
+  late final watchChallenge = WatchChallengeUseCase(challenges);
+  late final setChallengeStatus = SetChallengeStatusUseCase(challenges);
+  late final saveSolutionNotes = SaveSolutionNotesUseCase(challenges);
+  late final watchResources = WatchResourcesUseCase(resources);
+  late final bookmarkResource = BookmarkResourceUseCase(resources);
+  late final openLink = OpenLinkUseCase(links);
+  late final openResource = OpenResourceUseCase(resources, openLink);
+  late final watchSearchResults = WatchSearchResultsUseCase(search);
+  late final watchRecentSearches = WatchRecentSearchesUseCase(recentSearches);
+  late final saveRecentSearch = SaveRecentSearchUseCase(recentSearches);
+  late final clearRecentSearches = ClearRecentSearchesUseCase(recentSearches);
   late final watchDashboard = WatchDashboardUseCase(
     settings,
     roadmaps,
     progress,
     watchGoalProgress,
     notes,
+    challenges,
     clock,
   );
 
