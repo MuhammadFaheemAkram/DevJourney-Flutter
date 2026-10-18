@@ -34,8 +34,8 @@ DevJourney is built in **strict, reviewable phases**. Each phase ends with:
 |------:|-------|:------:|
 | 1 | Foundation: FVM project, design system base, typed routes with an onboarding gate, 5-tab shell with a navigation drawer, CI | ✅ Done |
 | 2 | Data models, drift store, the fake learning API and the catalog; Welcome | ✅ Done |
-| 3 | Roadmaps, the learning path, topics and the Dashboard | ⏳ Next |
-| 4 | Notes (Markdown) and goals | |
+| 3 | Roadmaps, the learning path, topics and the Dashboard | ✅ Done |
+| 4 | Notes (Markdown) and goals | ⏳ Next |
 | 5 | Challenges, resources and global search (FTS5) | |
 | 6 | Analytics, settings and daily reminders | |
 | 7 | Open-source polish and final docs | |
@@ -75,11 +75,13 @@ Packages arrive in the phase that first needs them.
 | Models | `freezed` (domain models, states) + `json_serializable` (the API's DTOs, `checked: true`) | 2 |
 | Database | `drift` + `drift_flutter` (SQLite): the catalog and the user's data, with foreign keys, `CHECK` constraints, indexes and exported schema versions | 2 |
 | Preferences | `shared_preferences` (`SharedPreferencesWithCache`, loaded before `runApp`) | 2 |
-| Time | `clock` (an injected `Clock`: "today" decides streaks, goal periods and demo dates) | 2 |
+| Time | `clock` (an injected `Clock`: "today" decides streaks, goal periods and demo dates); `intl` (`DateFormat`) | 2–3 |
+| Streams | `stream_transform` (`switchMap` to follow the active roadmap, `combineLatest` for the Dashboard) | 3 |
+| Adaptive UI | `cupertino_ui` (iOS alerts through `AlertDialog.adaptive`), `RefreshIndicator.adaptive` | 3 |
 | Lints / CI | `flutter_lints` + strict analyzer modes; GitHub Actions | 1 |
 | Testing | `flutter_test`, `bloc_test`, `mocktail` | 1+ |
 
-Planned: FTS5 search (Phase 5); `bloc_concurrency`, `stream_transform`, `intl` (Phase 3); a Markdown renderer (Phase 4); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
+Planned: FTS5 search and `bloc_concurrency` (Phase 5); a Markdown renderer (Phase 4); `url_launcher` (Phase 5); `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
 
 ---
 
@@ -92,7 +94,7 @@ lib/
 ├── app/        → root widget (MaterialApp.router, themes)
 ├── core/       → design system, navigation, the fake learning API, database, storage, (later) platform services
 ├── data/       → repository implementations + mappers
-├── domain/     → models, (later) pure calculations, contracts, use cases (pure Dart)
+├── domain/     → models, pure calculations (recommendation, streaks), contracts, use cases (pure Dart)
 ├── features/   → one folder per screen (Page + View + Cubit/Bloc)
 └── di/         → composition root (get_it + injectable)
 ```
@@ -150,14 +152,17 @@ DevJourney/
 │   ├── main.dart                   # binding → configureDependencies() → runApp
 │   ├── app/                        # DevJourneyApp: themes and the router
 │   ├── core/
-│   │   ├── design_system/          # theme/ (AppTheme, AppColors, tokens), widgets/ (state views, SectionHeader), large_text
+│   │   ├── design_system/          # theme/ (AppTheme, AppColors, tokens), formatting/ (labels, dates), widgets/ (RoadmapCard,
+│   │                               #   TopicRow, DifficultyChip, ProgressRing, StreakBanner, FilterChipGroup, AppSearchField,
+│   │                               #   an adaptive confirm dialog, state views), large_text
 │   │   ├── navigation/             # app_routes (+ .g.dart), app_router, onboarding_redirect, stream_listenable, Close fallback
 │   │   ├── network/                # LearningService + FakeLearningService, NetworkSimulator, dto/, asset_json_loader
 │   │   ├── storage/                # settings_local_data_source (SharedPreferencesWithCache)
-│   │   ├── database/               # app_database (drift v1), converters, tables/ (catalog, user), daos/ (catalog, user data)
-│   │   └── common/                 # Result, AppException, firstValue, IdGenerator
+│   │   ├── database/               # app_database (drift v1), converters, tables/ (catalog, user), daos/ (catalog, learning, user data)
+│   │   └── common/                 # Result, AppException, guardWrite, firstValue, IdGenerator
 │   ├── data/                       # mapper/ (the API's catalog → rows, the demo progress → rows), repository/
-│   ├── domain/                     # model/ (CalendarDate, the catalog, RoadmapProgress, AppSettings), repository/, usecase/
+│   ├── domain/                     # model/ (CalendarDate, the catalog, learning paths, streaks, the Dashboard, AppSettings),
+│   │                               #   calculation/ (recommendation, streak), repository/, usecase/
 │   ├── features/                   # welcome, shell (tabs + drawer), dashboard, roadmaps, roadmap_detail, topic_detail,
 │   │                               # notes, note_editor, goals, challenges, challenge_detail, resources, search,
 │   │                               # analytics, settings, about
@@ -208,6 +213,15 @@ There is no server. `FakeLearningService` is the app's only "remote" API:
 - **Nothing derived is stored:** no percentage, count or streak column exists. Roadmap progress is a `LEFT JOIN … GROUP BY` over topics and completions, recomputed whenever either changes.
 - **Preferences** live in `SharedPreferencesWithCache`, loaded before `runApp`, so the router knows at once whether to open Welcome or the Dashboard.
 
+## 🧭 How Progress, the Path and Streaks Work
+
+- **A learning path is one query:** the roadmap, its sections, their topics, and the user's completions and bookmarks, joined (`LEFT JOIN`s, ordered) and folded into a tree in Dart. Completing a topic re-runs it, so the checks, the section counts and the percentage always agree.
+- **Completing is idempotent:** one row per topic (`INSERT OR IGNORE`), with the day it happened. Completing a section completes only its open topics, today; topics done earlier keep their days. Uncompleting deletes the rows.
+- **What's next:** the first topic not yet completed, in section order, then topic order. A topic skipped earlier comes back first.
+- **The streak:** a day counts if the user completed a topic or a challenge, or checked in on a goal (one `UNION` query). The current streak counts back from today, or from yesterday if today has no activity yet: it isn't broken until the day ends. One missed day breaks it. Days are calendar days, so month and year ends can't.
+- **The Dashboard** follows the active roadmap with `switchMap` (choosing another swaps the query) and combines its path, the active days and the totals with `combineLatest`, so a completion anywhere updates it at once.
+- **Platform touches:** the confirmation before completing a section is a Material dialog on Android and an iOS alert on iOS (`AlertDialog.adaptive`); pull to refresh uses each platform's spinner (`RefreshIndicator.adaptive`).
+
 ---
 
 ## ✅ Testing
@@ -218,13 +232,15 @@ fvm dart format --output=none --set-exit-if-changed .
 fvm flutter test
 ```
 
-**171 tests** after Phase 2:
+**251 tests** after Phase 3:
+- **Learning:** the streak (today or not yet, gaps, month, year and leap-day boundaries, duplicates, future days), the recommendation, path counts; the learning DAO (the path as a tree, idempotent completion, section completion keeping earlier days, bookmarks, active days as a union, totals); the Dashboard use case with the demo worked out by hand (a 6-day streak, 7 of 12, State management next) and after completing a topic.
+- **Screens:** the Roadmaps, roadmap, topic and Dashboard Cubits on the real stack; their views with mocked Cubits; the design-system widgets, including the confirmation dialog on Android and iOS; app flows (Continue → complete → the Dashboard follows, completing a section after confirming, search and make a roadmap active, bookmarks).
 - **Data:** the catalog mapper (flattening, sources, every validation rule), the demo progress mapper (relative dates, instants, every validation rule), the bundled JSON itself, the DAOs (upsert counts, updates in place, **user data surviving a re-sync**, progress counts with zeros, `CHECK`, `SET NULL`, rollback), the fake service, the repositories (sync, re-sync, demo progress, offline, malformed content), the settings, the start use cases.
 - **Welcome:** the Cubit on the real data stack (load, failure and retry, the chosen roadmap, a double tap, a failed demo), the view with a mocked Cubit, and the real app's first launch (start learning, demo progress, offline and Try again).
 - **Navigation:** every rule of the onboarding gate; typed locations; the app on its real DI graph (first launch, each tab, the drawer over every tab, each drawer screen and Back, Search from the app bars, the note editor as a full-screen dialog, deep links with a Close button, an unknown location).
 - **Design system:** the themes, any `ColorScheme` driving them (for dynamic color later), and WCAG AA contrast of every learning color (completed, streak, the three difficulties) on the page, cards and filled fields in both themes.
 - **The drawer:** its order, the selected tab, where each item leads.
-- **The accessibility tour:** every screen, Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
+- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one, the section confirmation), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
 
 CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every pull request. It installs the FVM-pinned Flutter, checks that the committed generated code is up to date, then runs format, analyze and test.
 
@@ -253,6 +269,7 @@ CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every p
 
 - [Phase 1 — Foundation](docs/PHASE_1_SUMMARY.md)
 - [Phase 2 — Data Layer](docs/PHASE_2_SUMMARY.md)
+- [Phase 3 — Roadmaps + Topics](docs/PHASE_3_SUMMARY.md)
 
 ---
 

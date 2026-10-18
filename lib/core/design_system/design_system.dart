@@ -1,6 +1,7 @@
 /// One import for the whole design system: theme, tokens and shared widgets.
 library;
 
+export 'package:dev_journey/core/design_system/formatting/date_labels.dart';
 export 'package:dev_journey/core/design_system/formatting/labels.dart';
 export 'package:dev_journey/core/design_system/large_text.dart';
 export 'package:dev_journey/core/design_system/theme/app_colors.dart';
@@ -8,7 +9,15 @@ export 'package:dev_journey/core/design_system/theme/app_icon_size.dart';
 export 'package:dev_journey/core/design_system/theme/app_radius.dart';
 export 'package:dev_journey/core/design_system/theme/app_spacing.dart';
 export 'package:dev_journey/core/design_system/theme/app_theme.dart';
+export 'package:dev_journey/core/design_system/widgets/app_search_field.dart';
+export 'package:dev_journey/core/design_system/widgets/confirm_dialog.dart';
+export 'package:dev_journey/core/design_system/widgets/difficulty_chip.dart';
 export 'package:dev_journey/core/design_system/widgets/empty_state_view.dart';
 export 'package:dev_journey/core/design_system/widgets/error_view.dart';
+export 'package:dev_journey/core/design_system/widgets/filter_chip_group.dart';
 export 'package:dev_journey/core/design_system/widgets/loading_view.dart';
+export 'package:dev_journey/core/design_system/widgets/progress_ring.dart';
+export 'package:dev_journey/core/design_system/widgets/roadmap_card.dart';
 export 'package:dev_journey/core/design_system/widgets/section_header.dart';
+export 'package:dev_journey/core/design_system/widgets/streak_banner.dart';
+export 'package:dev_journey/core/design_system/widgets/topic_row.dart';

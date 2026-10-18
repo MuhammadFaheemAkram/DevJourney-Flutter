@@ -18,6 +18,7 @@ void main() {
         WidgetTester tester, {
         required String at,
         bool onboarded = true,
+        bool withDemoProgress = false,
         Future<void> Function()? beforeLaunch,
       }) async {
         tester.platformDispatcher
@@ -27,6 +28,7 @@ void main() {
         await pumpDevJourney(
           tester,
           onboarded: onboarded,
+          withDemoProgress: withDemoProgress,
           initialLocation: at,
           beforeLaunch: beforeLaunch,
         );
@@ -64,6 +66,27 @@ void main() {
               getIt<NetworkSimulator>().failRequests = true,
         );
         expect(find.text('Try again'), findsOneWidget);
+        await expectAccessible(tester);
+      });
+
+      for (final (name, location) in [
+        ('Dashboard, with progress', '/dashboard'),
+        ('Roadmaps, with progress', '/roadmaps'),
+        ('A learning path', '/roadmaps/flutter'),
+        ('A topic to learn', '/topics/flutter-state'),
+        ('A completed topic', '/topics/flutter-streams'),
+      ]) {
+        testWidgets(name, (tester) async {
+          await open(tester, at: location, withDemoProgress: true);
+          await expectAccessible(tester);
+        });
+      }
+
+      testWidgets('completing a section: the confirmation', (tester) async {
+        await open(tester, at: '/roadmaps/flutter', withDemoProgress: true);
+        await tester.tap(find.text('Mark section complete'));
+        await tester.pumpAndSettle();
+        expect(find.text('Complete "Architecture"?'), findsOneWidget);
         await expectAccessible(tester);
       });
 

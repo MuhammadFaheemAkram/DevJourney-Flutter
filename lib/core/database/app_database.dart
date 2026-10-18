@@ -1,5 +1,6 @@
 import 'package:dev_journey/core/database/converters.dart';
 import 'package:dev_journey/core/database/daos/catalog_dao.dart';
+import 'package:dev_journey/core/database/daos/learning_dao.dart';
 import 'package:dev_journey/core/database/daos/user_data_dao.dart';
 import 'package:dev_journey/core/database/tables/catalog_tables.dart';
 import 'package:dev_journey/core/database/tables/user_tables.dart';
@@ -38,7 +39,7 @@ part 'app_database.g.dart';
     GoalCheckIns,
     ChallengeStates,
   ],
-  daos: [CatalogDao, UserDataDao],
+  daos: [CatalogDao, LearningDao, UserDataDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Opens `dev_journey.sqlite` in the app's documents directory. Tests pass

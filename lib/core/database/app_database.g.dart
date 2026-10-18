@@ -4655,6 +4655,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'CREATE INDEX challenge_states_by_day ON challenge_states (completed_on)',
   );
   late final CatalogDao catalogDao = CatalogDao(this as AppDatabase);
+  late final LearningDao learningDao = LearningDao(this as AppDatabase);
   late final UserDataDao userDataDao = UserDataDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>

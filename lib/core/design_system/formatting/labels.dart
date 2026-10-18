@@ -23,3 +23,11 @@ extension DifficultyLabel on Difficulty {
 /// "1 topic", "12 topics".
 String countLabel(int count, String singular, [String? plural]) =>
     '$count ${count == 1 ? singular : (plural ?? '${singular}s')}';
+
+/// "45 min", "1 h", "1 h 30 min".
+String minutesLabel(int minutes) {
+  if (minutes < 60) return '$minutes min';
+  final hours = minutes ~/ 60;
+  final rest = minutes % 60;
+  return rest == 0 ? '$hours h' : '$hours h $rest min';
+}

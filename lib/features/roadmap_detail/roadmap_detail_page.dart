@@ -1,10 +1,10 @@
-import 'package:dev_journey/core/design_system/design_system.dart';
-import 'package:dev_journey/core/navigation/app_routes.dart';
-import 'package:dev_journey/core/navigation/fallback_close_button.dart';
+import 'package:dev_journey/di/injection.dart';
+import 'package:dev_journey/features/roadmap_detail/cubit/roadmap_detail_cubit.dart';
+import 'package:dev_journey/features/roadmap_detail/roadmap_detail_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// One roadmap's learning path ([roadmapId]): a placeholder until Phase 3.
-/// Opened by a link it has nothing to go back to, so it offers Close.
+/// One roadmap's learning path ([roadmapId]).
 class RoadmapDetailPage extends StatelessWidget {
   const RoadmapDetailPage({super.key, required this.roadmapId});
 
@@ -12,20 +12,9 @@ class RoadmapDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: fallbackCloseButton(
-          context,
-          () => const RoadmapsRoute().go(context),
-        ),
-        title: const Text('Roadmap'),
-      ),
-      body: const EmptyStateView(
-        icon: Icons.route_outlined,
-        title: 'Roadmap',
-        message:
-            'The learning path, its sections and topics arrive in Phase 3.',
-      ),
+    return BlocProvider(
+      create: (_) => getIt<RoadmapDetailCubit>(param1: roadmapId)..load(),
+      child: const RoadmapDetailView(),
     );
   }
 }
