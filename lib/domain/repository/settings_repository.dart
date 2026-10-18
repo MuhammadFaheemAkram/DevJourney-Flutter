@@ -1,4 +1,6 @@
 import 'package:dev_journey/domain/model/app_settings.dart';
+import 'package:dev_journey/domain/model/app_theme_mode.dart';
+import 'package:dev_journey/domain/model/reminder_time.dart';
 
 /// The device's preferences.
 abstract interface class SettingsRepository {
@@ -14,4 +16,12 @@ abstract interface class SettingsRepository {
   Future<void> setActiveRoadmapId(String roadmapId);
 
   Future<void> setCatalogVersion(int version);
+
+  Future<void> setThemeMode(AppThemeMode mode);
+
+  Future<void> setDynamicColor({required bool enabled});
+
+  Future<void> setReminderEnabled({required bool enabled});
+
+  Future<void> setReminderTime(ReminderTime time);
 }

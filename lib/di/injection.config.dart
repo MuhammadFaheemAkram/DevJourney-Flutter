@@ -22,9 +22,16 @@ import 'package:dev_journey/core/database/daos/resources_dao.dart' as _i324;
 import 'package:dev_journey/core/database/daos/search_dao.dart' as _i461;
 import 'package:dev_journey/core/database/daos/user_data_dao.dart' as _i650;
 import 'package:dev_journey/core/network/asset_json_loader.dart' as _i241;
+import 'package:dev_journey/core/network/catalog_publisher.dart' as _i387;
+import 'package:dev_journey/core/network/fake_api_developer_tools.dart'
+    as _i250;
 import 'package:dev_journey/core/network/fake_learning_service.dart' as _i975;
 import 'package:dev_journey/core/network/learning_service.dart' as _i343;
 import 'package:dev_journey/core/network/network_simulator.dart' as _i885;
+import 'package:dev_journey/core/platform/local_notifications_reminder_scheduler.dart'
+    as _i608;
+import 'package:dev_journey/core/platform/material_you_color_source.dart'
+    as _i31;
 import 'package:dev_journey/core/platform/url_launcher_link_opener.dart'
     as _i875;
 import 'package:dev_journey/core/storage/settings_local_data_source.dart'
@@ -49,7 +56,9 @@ import 'package:dev_journey/data/repository/search_repository_impl.dart'
     as _i434;
 import 'package:dev_journey/data/repository/settings_repository_impl.dart'
     as _i362;
-import 'package:dev_journey/di/app_module.dart' as _i713;
+import 'package:dev_journey/di/app_module.dart' as _i714;
+import 'package:dev_journey/domain/model/app_info.dart' as _i476;
+import 'package:dev_journey/domain/model/device_colors.dart' as _i1025;
 import 'package:dev_journey/domain/repository/catalog_repository.dart' as _i403;
 import 'package:dev_journey/domain/repository/challenges_repository.dart'
     as _i701;
@@ -65,11 +74,16 @@ import 'package:dev_journey/domain/repository/roadmap_repository.dart' as _i69;
 import 'package:dev_journey/domain/repository/search_repository.dart' as _i515;
 import 'package:dev_journey/domain/repository/settings_repository.dart'
     as _i689;
+import 'package:dev_journey/domain/service/developer_tools.dart' as _i961;
+import 'package:dev_journey/domain/service/dynamic_color_source.dart' as _i115;
 import 'package:dev_journey/domain/service/link_opener.dart' as _i1056;
+import 'package:dev_journey/domain/service/reminder_scheduler.dart' as _i357;
 import 'package:dev_journey/domain/usecase/bookmark_resource_use_case.dart'
     as _i258;
 import 'package:dev_journey/domain/usecase/bookmark_topic_use_case.dart'
     as _i325;
+import 'package:dev_journey/domain/usecase/change_reminder_time_use_case.dart'
+    as _i444;
 import 'package:dev_journey/domain/usecase/check_in_goal_use_case.dart'
     as _i849;
 import 'package:dev_journey/domain/usecase/clear_recent_searches_use_case.dart'
@@ -80,9 +94,13 @@ import 'package:dev_journey/domain/usecase/find_note_use_case.dart' as _i872;
 import 'package:dev_journey/domain/usecase/open_link_use_case.dart' as _i707;
 import 'package:dev_journey/domain/usecase/open_resource_use_case.dart'
     as _i509;
+import 'package:dev_journey/domain/usecase/refresh_reminder_use_case.dart'
+    as _i432;
+import 'package:dev_journey/domain/usecase/reset_progress_use_case.dart'
+    as _i328;
 import 'package:dev_journey/domain/usecase/restore_note_use_case.dart' as _i672;
 import 'package:dev_journey/domain/usecase/save_goal_use_case.dart' as _i190;
-import 'package:dev_journey/domain/usecase/save_note_use_case.dart' as _i250;
+import 'package:dev_journey/domain/usecase/save_note_use_case.dart' as _i251;
 import 'package:dev_journey/domain/usecase/save_recent_search_use_case.dart'
     as _i743;
 import 'package:dev_journey/domain/usecase/save_solution_notes_use_case.dart'
@@ -91,6 +109,8 @@ import 'package:dev_journey/domain/usecase/set_active_roadmap_use_case.dart'
     as _i666;
 import 'package:dev_journey/domain/usecase/set_challenge_status_use_case.dart'
     as _i1027;
+import 'package:dev_journey/domain/usecase/set_reminder_enabled_use_case.dart'
+    as _i271;
 import 'package:dev_journey/domain/usecase/set_section_completed_use_case.dart'
     as _i563;
 import 'package:dev_journey/domain/usecase/set_topic_completed_use_case.dart'
@@ -102,6 +122,12 @@ import 'package:dev_journey/domain/usecase/start_with_demo_progress_use_case.dar
 import 'package:dev_journey/domain/usecase/sync_catalog_use_case.dart' as _i426;
 import 'package:dev_journey/domain/usecase/undo_check_in_use_case.dart'
     as _i675;
+import 'package:dev_journey/domain/usecase/update_dynamic_color_use_case.dart'
+    as _i713;
+import 'package:dev_journey/domain/usecase/update_theme_mode_use_case.dart'
+    as _i300;
+import 'package:dev_journey/domain/usecase/watch_analytics_use_case.dart'
+    as _i588;
 import 'package:dev_journey/domain/usecase/watch_challenge_use_case.dart'
     as _i779;
 import 'package:dev_journey/domain/usecase/watch_challenges_use_case.dart'
@@ -110,7 +136,7 @@ import 'package:dev_journey/domain/usecase/watch_dashboard_use_case.dart'
     as _i618;
 import 'package:dev_journey/domain/usecase/watch_goal_progress_use_case.dart'
     as _i85;
-import 'package:dev_journey/domain/usecase/watch_notes_use_case.dart' as _i387;
+import 'package:dev_journey/domain/usecase/watch_notes_use_case.dart' as _i388;
 import 'package:dev_journey/domain/usecase/watch_recent_searches_use_case.dart'
     as _i868;
 import 'package:dev_journey/domain/usecase/watch_resources_use_case.dart'
@@ -126,6 +152,8 @@ import 'package:dev_journey/domain/usecase/watch_settings_use_case.dart'
 import 'package:dev_journey/domain/usecase/watch_topic_choices_use_case.dart'
     as _i977;
 import 'package:dev_journey/domain/usecase/watch_topic_use_case.dart' as _i816;
+import 'package:dev_journey/features/analytics/cubit/analytics_cubit.dart'
+    as _i408;
 import 'package:dev_journey/features/challenge_detail/cubit/challenge_detail_cubit.dart'
     as _i339;
 import 'package:dev_journey/features/challenges/cubit/challenges_cubit.dart'
@@ -143,6 +171,10 @@ import 'package:dev_journey/features/roadmap_detail/cubit/roadmap_detail_cubit.d
 import 'package:dev_journey/features/roadmaps/cubit/roadmaps_cubit.dart'
     as _i481;
 import 'package:dev_journey/features/search/bloc/search_bloc.dart' as _i953;
+import 'package:dev_journey/features/settings/cubit/settings_cubit.dart'
+    as _i604;
+import 'package:dev_journey/features/settings/cubit/settings_tools_cubit.dart'
+    as _i934;
 import 'package:dev_journey/features/topic_detail/cubit/topic_detail_cubit.dart'
     as _i1057;
 import 'package:dev_journey/features/welcome/cubit/welcome_cubit.dart' as _i695;
@@ -160,6 +192,7 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final appModule = _$AppModule();
     gh.lazySingleton<_i927.IdGenerator>(() => _i927.IdGenerator());
+    gh.lazySingleton<_i387.CatalogPublisher>(() => _i387.CatalogPublisher());
     gh.lazySingleton<_i885.NetworkSimulator>(() => _i885.NetworkSimulator());
     gh.lazySingleton<_i281.AssetBundle>(() => appModule.assetBundle);
     gh.lazySingleton<_i454.Clock>(() => appModule.clock);
@@ -167,6 +200,13 @@ extension GetItInjectableX on _i174.GetIt {
     await gh.lazySingletonAsync<_i460.SharedPreferencesWithCache>(
       () => appModule.preferences,
       preResolve: true,
+    );
+    await gh.lazySingletonAsync<_i476.AppInfo>(
+      () => appModule.appInfo,
+      preResolve: true,
+    );
+    gh.lazySingleton<_i115.DynamicColorSource>(
+      () => const _i31.MaterialYouColorSource(),
     );
     gh.lazySingleton<_i1010.CatalogDao>(
       () => appModule.catalogDao(gh<_i340.AppDatabase>()),
@@ -192,6 +232,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i650.UserDataDao>(
       () => appModule.userDataDao(gh<_i340.AppDatabase>()),
     );
+    gh.lazySingleton<_i357.ReminderScheduler>(
+      () => _i608.LocalNotificationsReminderScheduler(),
+    );
     gh.lazySingleton<_i323.ResourcesRepository>(
       () => _i928.ResourcesRepositoryImpl(
         gh<_i324.ResourcesDao>(),
@@ -201,18 +244,23 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1056.LinkOpener>(
       () => const _i875.UrlLauncherLinkOpener(),
     );
+    gh.lazySingleton<_i293.ProgressRepository>(
+      () => _i1067.ProgressRepositoryImpl(
+        gh<_i46.LearningDao>(),
+        gh<_i650.UserDataDao>(),
+        gh<_i454.Clock>(),
+      ),
+    );
     gh.lazySingleton<_i515.SearchRepository>(
       () => _i434.SearchRepositoryImpl(gh<_i461.SearchDao>()),
+    );
+    await gh.lazySingletonAsync<_i1025.DeviceColors>(
+      () => appModule.deviceColors(gh<_i115.DynamicColorSource>()),
+      preResolve: true,
     );
     gh.lazySingleton<_i669.SettingsLocalDataSource>(
       () =>
           _i669.SettingsLocalDataSource(gh<_i460.SharedPreferencesWithCache>()),
-    );
-    gh.lazySingleton<_i293.ProgressRepository>(
-      () => _i1067.ProgressRepositoryImpl(
-        gh<_i46.LearningDao>(),
-        gh<_i454.Clock>(),
-      ),
     );
     gh.lazySingleton<_i701.ChallengesRepository>(
       () => _i499.ChallengesRepositoryImpl(
@@ -244,8 +292,29 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i707.OpenLinkUseCase>(
       () => _i707.OpenLinkUseCase(gh<_i1056.LinkOpener>()),
     );
+    gh.lazySingleton<_i961.DeveloperTools>(
+      () => _i250.FakeApiDeveloperTools(
+        gh<_i885.NetworkSimulator>(),
+        gh<_i387.CatalogPublisher>(),
+      ),
+    );
     gh.factory<_i313.WatchSearchResultsUseCase>(
       () => _i313.WatchSearchResultsUseCase(gh<_i515.SearchRepository>()),
+    );
+    gh.lazySingleton<_i343.LearningService>(
+      () => _i975.FakeLearningService(
+        gh<_i241.AssetJsonLoader>(),
+        gh<_i885.NetworkSimulator>(),
+        gh<_i387.CatalogPublisher>(),
+      ),
+    );
+    gh.lazySingleton<_i403.CatalogRepository>(
+      () => _i217.CatalogRepositoryImpl(
+        gh<_i343.LearningService>(),
+        gh<_i1010.CatalogDao>(),
+        gh<_i650.UserDataDao>(),
+        gh<_i454.Clock>(),
+      ),
     );
     gh.lazySingleton<_i243.NotesRepository>(
       () => _i801.NotesRepositoryImpl(
@@ -263,11 +332,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i672.RestoreNoteUseCase>(
       () => _i672.RestoreNoteUseCase(gh<_i243.NotesRepository>()),
     );
-    gh.factory<_i250.SaveNoteUseCase>(
-      () => _i250.SaveNoteUseCase(gh<_i243.NotesRepository>()),
+    gh.factory<_i251.SaveNoteUseCase>(
+      () => _i251.SaveNoteUseCase(gh<_i243.NotesRepository>()),
     );
-    gh.factory<_i387.WatchNotesUseCase>(
-      () => _i387.WatchNotesUseCase(gh<_i243.NotesRepository>()),
+    gh.factory<_i388.WatchNotesUseCase>(
+      () => _i388.WatchNotesUseCase(gh<_i243.NotesRepository>()),
     );
     gh.lazySingleton<_i516.GoalsRepository>(
       () => _i138.GoalsRepositoryImpl(
@@ -288,6 +357,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i325.BookmarkTopicUseCase>(
       () => _i325.BookmarkTopicUseCase(gh<_i293.ProgressRepository>()),
     );
+    gh.factory<_i328.ResetProgressUseCase>(
+      () => _i328.ResetProgressUseCase(gh<_i293.ProgressRepository>()),
+    );
     gh.factory<_i563.SetSectionCompletedUseCase>(
       () => _i563.SetSectionCompletedUseCase(gh<_i293.ProgressRepository>()),
     );
@@ -302,12 +374,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i689.SettingsRepository>(
       () => _i362.SettingsRepositoryImpl(gh<_i669.SettingsLocalDataSource>()),
-    );
-    gh.lazySingleton<_i343.LearningService>(
-      () => _i975.FakeLearningService(
-        gh<_i241.AssetJsonLoader>(),
-        gh<_i885.NetworkSimulator>(),
-      ),
     );
     gh.factoryParam<_i339.ChallengeDetailCubit, String, dynamic>(
       (challengeId, _) => _i339.ChallengeDetailCubit(
@@ -324,9 +390,16 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i144.NotesCubit>(
       () => _i144.NotesCubit(
-        gh<_i387.WatchNotesUseCase>(),
+        gh<_i388.WatchNotesUseCase>(),
         gh<_i159.DeleteNoteUseCase>(),
         gh<_i672.RestoreNoteUseCase>(),
+        gh<_i454.Clock>(),
+      ),
+    );
+    gh.factory<_i588.WatchAnalyticsUseCase>(
+      () => _i588.WatchAnalyticsUseCase(
+        gh<_i516.GoalsRepository>(),
+        gh<_i69.RoadmapRepository>(),
         gh<_i454.Clock>(),
       ),
     );
@@ -349,6 +422,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i406.StartLearningUseCase>(
       () => _i406.StartLearningUseCase(gh<_i689.SettingsRepository>()),
     );
+    gh.factory<_i713.UpdateDynamicColorUseCase>(
+      () => _i713.UpdateDynamicColorUseCase(gh<_i689.SettingsRepository>()),
+    );
+    gh.factory<_i300.UpdateThemeModeUseCase>(
+      () => _i300.UpdateThemeModeUseCase(gh<_i689.SettingsRepository>()),
+    );
     gh.factory<_i594.WatchSettingsUseCase>(
       () => _i594.WatchSettingsUseCase(gh<_i689.SettingsRepository>()),
     );
@@ -363,14 +442,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i675.UndoCheckInUseCase>(
       () => _i675.UndoCheckInUseCase(gh<_i516.GoalsRepository>()),
-    );
-    gh.lazySingleton<_i403.CatalogRepository>(
-      () => _i217.CatalogRepositoryImpl(
-        gh<_i343.LearningService>(),
-        gh<_i1010.CatalogDao>(),
-        gh<_i650.UserDataDao>(),
-        gh<_i454.Clock>(),
-      ),
     );
     gh.factory<_i426.SyncCatalogUseCase>(
       () => _i426.SyncCatalogUseCase(
@@ -416,6 +487,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i583.RecentSearchesRepository>(),
       ),
     );
+    gh.factory<_i408.AnalyticsCubit>(
+      () => _i408.AnalyticsCubit(gh<_i588.WatchAnalyticsUseCase>()),
+    );
     gh.factoryParam<_i424.RoadmapDetailCubit, String, dynamic>(
       (roadmapId, _) => _i424.RoadmapDetailCubit(
         gh<_i808.WatchRoadmapPathUseCase>(),
@@ -444,10 +518,28 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i509.OpenResourceUseCase>(),
       ),
     );
+    gh.factory<_i444.ChangeReminderTimeUseCase>(
+      () => _i444.ChangeReminderTimeUseCase(
+        gh<_i689.SettingsRepository>(),
+        gh<_i357.ReminderScheduler>(),
+      ),
+    );
+    gh.factory<_i432.RefreshReminderUseCase>(
+      () => _i432.RefreshReminderUseCase(
+        gh<_i689.SettingsRepository>(),
+        gh<_i357.ReminderScheduler>(),
+      ),
+    );
+    gh.factory<_i271.SetReminderEnabledUseCase>(
+      () => _i271.SetReminderEnabledUseCase(
+        gh<_i689.SettingsRepository>(),
+        gh<_i357.ReminderScheduler>(),
+      ),
+    );
     gh.factoryParam<_i398.NoteEditorCubit, String?, String?>(
       (noteId, topicId) => _i398.NoteEditorCubit(
         gh<_i872.FindNoteUseCase>(),
-        gh<_i250.SaveNoteUseCase>(),
+        gh<_i251.SaveNoteUseCase>(),
         gh<_i159.DeleteNoteUseCase>(),
         gh<_i977.WatchTopicChoicesUseCase>(),
         gh<_i707.OpenLinkUseCase>(),
@@ -460,12 +552,22 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i816.WatchTopicUseCase>(),
         gh<_i623.SetTopicCompletedUseCase>(),
         gh<_i325.BookmarkTopicUseCase>(),
-        gh<_i387.WatchNotesUseCase>(),
+        gh<_i388.WatchNotesUseCase>(),
         gh<_i449.WatchResourcesUseCase>(),
         gh<_i258.BookmarkResourceUseCase>(),
         gh<_i707.OpenLinkUseCase>(),
         gh<_i454.Clock>(),
         topicId,
+      ),
+    );
+    gh.factory<_i934.SettingsToolsCubit>(
+      () => _i934.SettingsToolsCubit(
+        gh<_i271.SetReminderEnabledUseCase>(),
+        gh<_i444.ChangeReminderTimeUseCase>(),
+        gh<_i426.SyncCatalogUseCase>(),
+        gh<_i328.ResetProgressUseCase>(),
+        gh<_i357.ReminderScheduler>(),
+        gh<_i961.DeveloperTools>(),
       ),
     );
     gh.factory<_i618.WatchDashboardUseCase>(
@@ -477,6 +579,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i243.NotesRepository>(),
         gh<_i701.ChallengesRepository>(),
         gh<_i454.Clock>(),
+      ),
+    );
+    gh.factory<_i604.SettingsCubit>(
+      () => _i604.SettingsCubit(
+        gh<_i689.SettingsRepository>(),
+        gh<_i300.UpdateThemeModeUseCase>(),
+        gh<_i713.UpdateDynamicColorUseCase>(),
+        gh<_i1025.DeviceColors>(),
       ),
     );
     gh.factory<_i353.DashboardCubit>(
@@ -494,4 +604,4 @@ extension GetItInjectableX on _i174.GetIt {
   }
 }
 
-class _$AppModule extends _i713.AppModule {}
+class _$AppModule extends _i714.AppModule {}

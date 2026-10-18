@@ -18,6 +18,10 @@ class SettingsLocalDataSource {
   static const activeRoadmapKey = 'settings.activeRoadmapId';
   static const catalogVersionKey = 'settings.catalogVersion';
   static const recentSearchesKey = 'search.recent';
+  static const themeModeKey = 'settings.themeMode';
+  static const dynamicColorKey = 'settings.dynamicColor';
+  static const reminderEnabledKey = 'settings.reminderEnabled';
+  static const reminderTimeKey = 'settings.reminderTime';
 
   /// The only keys the cache loads and allows writing.
   static const allowList = {
@@ -25,6 +29,10 @@ class SettingsLocalDataSource {
     activeRoadmapKey,
     catalogVersionKey,
     recentSearchesKey,
+    themeModeKey,
+    dynamicColorKey,
+    reminderEnabledKey,
+    reminderTimeKey,
   };
 
   final SharedPreferencesWithCache _preferences;
@@ -38,6 +46,16 @@ class SettingsLocalDataSource {
   List<String>? get recentSearches =>
       _preferences.getStringList(recentSearchesKey);
 
+  /// The theme mode's name ("dark").
+  String? get themeMode => _preferences.getString(themeModeKey);
+
+  bool? get dynamicColor => _preferences.getBool(dynamicColorKey);
+
+  bool? get reminderEnabled => _preferences.getBool(reminderEnabledKey);
+
+  /// `HH:mm`.
+  String? get reminderTime => _preferences.getString(reminderTimeKey);
+
   Future<void> setOnboarded({required bool onboarded}) =>
       _preferences.setBool(onboardedKey, onboarded);
 
@@ -49,4 +67,16 @@ class SettingsLocalDataSource {
 
   Future<void> setRecentSearches(List<String> searches) =>
       _preferences.setStringList(recentSearchesKey, searches);
+
+  Future<void> setThemeMode(String name) =>
+      _preferences.setString(themeModeKey, name);
+
+  Future<void> setDynamicColor({required bool enabled}) =>
+      _preferences.setBool(dynamicColorKey, enabled);
+
+  Future<void> setReminderEnabled({required bool enabled}) =>
+      _preferences.setBool(reminderEnabledKey, enabled);
+
+  Future<void> setReminderTime(String hhmm) =>
+      _preferences.setString(reminderTimeKey, hhmm);
 }

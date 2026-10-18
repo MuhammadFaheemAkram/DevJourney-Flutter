@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dev_journey/core/common/result.dart';
+import 'package:dev_journey/core/design_system/formatting/labels.dart';
 import 'package:dev_journey/domain/model/app_settings.dart';
 import 'package:dev_journey/domain/model/learning_enums.dart';
 import 'package:dev_journey/domain/model/roadmap_progress.dart';
@@ -50,23 +51,12 @@ class RoadmapsCubit extends Cubit<RoadmapsState> {
     final result = await _syncCatalog();
     if (isClosed) return;
     final message = switch (result) {
-      Ok(:final value) when value.hasNewContent => _whatsNew(value),
-      Ok() => 'Everything is up to date',
+      Ok(:final value) => syncSummary(value),
       Err(:final exception) => exception.message,
     };
     emit(
       state.copyWith(message: message, messageSerial: state.messageSerial + 1),
     );
-  }
-
-  static String _whatsNew(SyncResult result) {
-    String count(int n, String what) => '$n new $what${n == 1 ? '' : 's'}';
-    return [
-      if (result.newRoadmaps > 0) count(result.newRoadmaps, 'roadmap'),
-      if (result.newTopics > 0) count(result.newTopics, 'topic'),
-      if (result.newResources > 0) count(result.newResources, 'resource'),
-      if (result.newChallenges > 0) count(result.newChallenges, 'challenge'),
-    ].join(', ');
   }
 
   @override

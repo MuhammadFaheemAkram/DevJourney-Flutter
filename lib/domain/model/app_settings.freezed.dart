@@ -19,7 +19,11 @@ mixin _$AppSettings {
 /// roadmap was chosen.
  bool get onboarded;/// The roadmap the Dashboard follows.
  String? get activeRoadmapId;/// The version of the last catalog synced (0 before the first sync).
- int get catalogVersion;
+ int get catalogVersion; AppThemeMode get themeMode;/// Colors from the wallpaper (Android 12+). On by default, as Material
+/// You apps are; ignored where the device has none.
+ bool get dynamicColor;/// Reads "on" only while notifications are allowed: the reminder use
+/// cases turn it off if permission is denied or later revoked.
+ bool get reminderEnabled; ReminderTime get reminderTime;
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,20 +35,20 @@ $AppSettingsCopyWith<AppSettings> get copyWith => _$AppSettingsCopyWithImpl<AppS
 @override
 bool operator ==(Object other) {
   final _this = this as AppSettings;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.onboarded, _this.onboarded) || other.onboarded == _this.onboarded)&&(identical(other.activeRoadmapId, _this.activeRoadmapId) || other.activeRoadmapId == _this.activeRoadmapId)&&(identical(other.catalogVersion, _this.catalogVersion) || other.catalogVersion == _this.catalogVersion));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.onboarded, _this.onboarded) || other.onboarded == _this.onboarded)&&(identical(other.activeRoadmapId, _this.activeRoadmapId) || other.activeRoadmapId == _this.activeRoadmapId)&&(identical(other.catalogVersion, _this.catalogVersion) || other.catalogVersion == _this.catalogVersion)&&(identical(other.themeMode, _this.themeMode) || other.themeMode == _this.themeMode)&&(identical(other.dynamicColor, _this.dynamicColor) || other.dynamicColor == _this.dynamicColor)&&(identical(other.reminderEnabled, _this.reminderEnabled) || other.reminderEnabled == _this.reminderEnabled)&&(identical(other.reminderTime, _this.reminderTime) || other.reminderTime == _this.reminderTime));
 }
 
 
 @override
 int get hashCode {
   final _this = this as AppSettings;
-  return Object.hash(runtimeType,_this.onboarded,_this.activeRoadmapId,_this.catalogVersion);
+  return Object.hash(runtimeType,_this.onboarded,_this.activeRoadmapId,_this.catalogVersion,_this.themeMode,_this.dynamicColor,_this.reminderEnabled,_this.reminderTime);
 }
 
 @override
 String toString() {
   final _this = this as AppSettings;
-  return 'AppSettings(onboarded: ${_this.onboarded}, activeRoadmapId: ${_this.activeRoadmapId}, catalogVersion: ${_this.catalogVersion})';
+  return 'AppSettings(onboarded: ${_this.onboarded}, activeRoadmapId: ${_this.activeRoadmapId}, catalogVersion: ${_this.catalogVersion}, themeMode: ${_this.themeMode}, dynamicColor: ${_this.dynamicColor}, reminderEnabled: ${_this.reminderEnabled}, reminderTime: ${_this.reminderTime})';
 }
 
 
@@ -55,11 +59,11 @@ abstract mixin class $AppSettingsCopyWith<$Res>  {
   factory $AppSettingsCopyWith(AppSettings value, $Res Function(AppSettings) _then) = _$AppSettingsCopyWithImpl;
 @useResult
 $Res call({
- bool onboarded, String? activeRoadmapId, int catalogVersion
+ bool onboarded, String? activeRoadmapId, int catalogVersion, AppThemeMode themeMode, bool dynamicColor, bool reminderEnabled, ReminderTime reminderTime
 });
 
 
-
+$ReminderTimeCopyWith<$Res> get reminderTime;
 
 }
 /// @nodoc
@@ -72,15 +76,28 @@ class _$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? onboarded = null,Object? activeRoadmapId = freezed,Object? catalogVersion = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? onboarded = null,Object? activeRoadmapId = freezed,Object? catalogVersion = null,Object? themeMode = null,Object? dynamicColor = null,Object? reminderEnabled = null,Object? reminderTime = null,}) {
   return _then(AppSettings(
 onboarded: null == onboarded ? _self.onboarded : onboarded // ignore: cast_nullable_to_non_nullable
 as bool,activeRoadmapId: freezed == activeRoadmapId ? _self.activeRoadmapId : activeRoadmapId // ignore: cast_nullable_to_non_nullable
 as String?,catalogVersion: null == catalogVersion ? _self.catalogVersion : catalogVersion // ignore: cast_nullable_to_non_nullable
-as int,
+as int,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as AppThemeMode,dynamicColor: null == dynamicColor ? _self.dynamicColor : dynamicColor // ignore: cast_nullable_to_non_nullable
+as bool,reminderEnabled: null == reminderEnabled ? _self.reminderEnabled : reminderEnabled // ignore: cast_nullable_to_non_nullable
+as bool,reminderTime: null == reminderTime ? _self.reminderTime : reminderTime // ignore: cast_nullable_to_non_nullable
+as ReminderTime,
   ));
 }
-
+/// Create a copy of AppSettings
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReminderTimeCopyWith<$Res> get reminderTime {
+  
+  return $ReminderTimeCopyWith<$Res>(_self.reminderTime, (value) {
+    return _then(_self.copyWith(reminderTime: value));
+  });
+}
 }
 
 
@@ -162,10 +179,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool onboarded,  String? activeRoadmapId,  int catalogVersion)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool onboarded,  String? activeRoadmapId,  int catalogVersion,  AppThemeMode themeMode,  bool dynamicColor,  bool reminderEnabled,  ReminderTime reminderTime)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion);case _:
+return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion,_that.themeMode,_that.dynamicColor,_that.reminderEnabled,_that.reminderTime);case _:
   return orElse();
 
 }
@@ -183,10 +200,10 @@ return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool onboarded,  String? activeRoadmapId,  int catalogVersion)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool onboarded,  String? activeRoadmapId,  int catalogVersion,  AppThemeMode themeMode,  bool dynamicColor,  bool reminderEnabled,  ReminderTime reminderTime)  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings():
-return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion);case _:
+return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion,_that.themeMode,_that.dynamicColor,_that.reminderEnabled,_that.reminderTime);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +220,10 @@ return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool onboarded,  String? activeRoadmapId,  int catalogVersion)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool onboarded,  String? activeRoadmapId,  int catalogVersion,  AppThemeMode themeMode,  bool dynamicColor,  bool reminderEnabled,  ReminderTime reminderTime)?  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion);case _:
+return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion,_that.themeMode,_that.dynamicColor,_that.reminderEnabled,_that.reminderTime);case _:
   return null;
 
 }
@@ -218,7 +235,7 @@ return $default(_that.onboarded,_that.activeRoadmapId,_that.catalogVersion);case
 
 
 class _AppSettings implements AppSettings {
-  const _AppSettings({this.onboarded = false, this.activeRoadmapId, this.catalogVersion = 0});
+  const _AppSettings({this.onboarded = false, this.activeRoadmapId, this.catalogVersion = 0, this.themeMode = AppThemeMode.system, this.dynamicColor = true, this.reminderEnabled = false, this.reminderTime = ReminderTime.evening});
   
 
 /// Whether the user has left Welcome: the catalog is stored and a
@@ -228,6 +245,14 @@ class _AppSettings implements AppSettings {
 @override final  String? activeRoadmapId;
 /// The version of the last catalog synced (0 before the first sync).
 @override@JsonKey() final  int catalogVersion;
+@override@JsonKey() final  AppThemeMode themeMode;
+/// Colors from the wallpaper (Android 12+). On by default, as Material
+/// You apps are; ignored where the device has none.
+@override@JsonKey() final  bool dynamicColor;
+/// Reads "on" only while notifications are allowed: the reminder use
+/// cases turn it off if permission is denied or later revoked.
+@override@JsonKey() final  bool reminderEnabled;
+@override@JsonKey() final  ReminderTime reminderTime;
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -239,18 +264,18 @@ _$AppSettingsCopyWith<_AppSettings> get copyWith => __$AppSettingsCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.onboarded, onboarded) || other.onboarded == onboarded)&&(identical(other.activeRoadmapId, activeRoadmapId) || other.activeRoadmapId == activeRoadmapId)&&(identical(other.catalogVersion, catalogVersion) || other.catalogVersion == catalogVersion));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.onboarded, onboarded) || other.onboarded == onboarded)&&(identical(other.activeRoadmapId, activeRoadmapId) || other.activeRoadmapId == activeRoadmapId)&&(identical(other.catalogVersion, catalogVersion) || other.catalogVersion == catalogVersion)&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.dynamicColor, dynamicColor) || other.dynamicColor == dynamicColor)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderTime, reminderTime) || other.reminderTime == reminderTime));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,onboarded,activeRoadmapId,catalogVersion);
+    return Object.hash(runtimeType,onboarded,activeRoadmapId,catalogVersion,themeMode,dynamicColor,reminderEnabled,reminderTime);
 }
 
 @override
 String toString() {
-    return 'AppSettings(onboarded: $onboarded, activeRoadmapId: $activeRoadmapId, catalogVersion: $catalogVersion)';
+    return 'AppSettings(onboarded: $onboarded, activeRoadmapId: $activeRoadmapId, catalogVersion: $catalogVersion, themeMode: $themeMode, dynamicColor: $dynamicColor, reminderEnabled: $reminderEnabled, reminderTime: $reminderTime)';
 }
 
 
@@ -261,11 +286,11 @@ abstract mixin class _$AppSettingsCopyWith<$Res> implements $AppSettingsCopyWith
   factory _$AppSettingsCopyWith(_AppSettings value, $Res Function(_AppSettings) _then) = __$AppSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- bool onboarded, String? activeRoadmapId, int catalogVersion
+ bool onboarded, String? activeRoadmapId, int catalogVersion, AppThemeMode themeMode, bool dynamicColor, bool reminderEnabled, ReminderTime reminderTime
 });
 
 
-
+@override $ReminderTimeCopyWith<$Res> get reminderTime;
 
 }
 /// @nodoc
@@ -278,16 +303,29 @@ class __$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? onboarded = null,Object? activeRoadmapId = freezed,Object? catalogVersion = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? onboarded = null,Object? activeRoadmapId = freezed,Object? catalogVersion = null,Object? themeMode = null,Object? dynamicColor = null,Object? reminderEnabled = null,Object? reminderTime = null,}) {
   return _then(_AppSettings(
 onboarded: null == onboarded ? _self.onboarded : onboarded // ignore: cast_nullable_to_non_nullable
 as bool,activeRoadmapId: freezed == activeRoadmapId ? _self.activeRoadmapId : activeRoadmapId // ignore: cast_nullable_to_non_nullable
 as String?,catalogVersion: null == catalogVersion ? _self.catalogVersion : catalogVersion // ignore: cast_nullable_to_non_nullable
-as int,
+as int,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as AppThemeMode,dynamicColor: null == dynamicColor ? _self.dynamicColor : dynamicColor // ignore: cast_nullable_to_non_nullable
+as bool,reminderEnabled: null == reminderEnabled ? _self.reminderEnabled : reminderEnabled // ignore: cast_nullable_to_non_nullable
+as bool,reminderTime: null == reminderTime ? _self.reminderTime : reminderTime // ignore: cast_nullable_to_non_nullable
+as ReminderTime,
   ));
 }
 
-
+/// Create a copy of AppSettings
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ReminderTimeCopyWith<$Res> get reminderTime {
+  
+  return $ReminderTimeCopyWith<$Res>(_self.reminderTime, (value) {
+    return _then(_self.copyWith(reminderTime: value));
+  });
+}
 }
 
 // dart format on

@@ -2,6 +2,7 @@ import 'package:clock/clock.dart';
 import 'package:dev_journey/core/common/guard_write.dart';
 import 'package:dev_journey/core/common/result.dart';
 import 'package:dev_journey/core/database/daos/learning_dao.dart';
+import 'package:dev_journey/core/database/daos/user_data_dao.dart';
 import 'package:dev_journey/domain/model/calendar_date.dart';
 import 'package:dev_journey/domain/repository/progress_repository.dart';
 import 'package:injectable/injectable.dart';
@@ -11,9 +12,10 @@ import 'package:injectable/injectable.dart';
 /// streak.
 @LazySingleton(as: ProgressRepository)
 class ProgressRepositoryImpl implements ProgressRepository {
-  const ProgressRepositoryImpl(this._dao, this._clock);
+  const ProgressRepositoryImpl(this._dao, this._userData, this._clock);
 
   final LearningDao _dao;
+  final UserDataDao _userData;
   final Clock _clock;
 
   CalendarDate get _today => CalendarDate.fromDateTime(_clock.now());
@@ -57,4 +59,8 @@ class ProgressRepositoryImpl implements ProgressRepository {
   @override
   Stream<({int topics, int challenges})> watchCompletedCounts() =>
       _dao.watchCompletedCounts();
+
+  @override
+  Future<Result<void>> resetProgress() =>
+      guardWrite('Resetting progress', _userData.resetProgress);
 }

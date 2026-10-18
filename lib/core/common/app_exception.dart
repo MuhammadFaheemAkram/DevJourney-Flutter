@@ -65,6 +65,12 @@ final class LinkOpenFailedException extends AppException {
   const LinkOpenFailedException() : super("Couldn't open the link.");
 }
 
+/// The user (or the system) didn't allow notifications.
+final class NotificationsDeniedException extends AppException {
+  const NotificationsDeniedException()
+    : super('Notifications are off for DevJourney.');
+}
+
 /// Anything unexpected that isn't one of the cases above.
 final class UnknownException extends AppException {
   const UnknownException() : super('Something went wrong. Please try again.');

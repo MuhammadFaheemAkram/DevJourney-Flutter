@@ -15,6 +15,13 @@ abstract final class AppTheme {
 
   static ThemeData dark() => fromScheme(_seeded(Brightness.dark));
 
+  /// The theme from the wallpaper's color (Android 12+ "dynamic color"),
+  /// with Material You's own variant, so the app matches the system.
+  static ThemeData fromWallpaper(Color color, Brightness brightness) =>
+      fromScheme(
+        ColorScheme.fromSeed(seedColor: color, brightness: brightness),
+      );
+
   static ColorScheme _seeded(Brightness brightness) => ColorScheme.fromSeed(
     seedColor: seedColor,
     brightness: brightness,

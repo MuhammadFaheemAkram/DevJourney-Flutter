@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:dev_journey/core/storage/settings_local_data_source.dart';
 import 'package:dev_journey/domain/model/app_settings.dart';
+import 'package:dev_journey/domain/model/app_theme_mode.dart';
+import 'package:dev_journey/domain/model/reminder_time.dart';
 import 'package:dev_journey/domain/repository/settings_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -52,6 +54,30 @@ class SettingsRepositoryImpl implements SettingsRepository {
     return _local.setCatalogVersion(version);
   }
 
+  @override
+  Future<void> setThemeMode(AppThemeMode mode) {
+    _publish(_current.copyWith(themeMode: mode));
+    return _local.setThemeMode(mode.name);
+  }
+
+  @override
+  Future<void> setDynamicColor({required bool enabled}) {
+    _publish(_current.copyWith(dynamicColor: enabled));
+    return _local.setDynamicColor(enabled: enabled);
+  }
+
+  @override
+  Future<void> setReminderEnabled({required bool enabled}) {
+    _publish(_current.copyWith(reminderEnabled: enabled));
+    return _local.setReminderEnabled(enabled: enabled);
+  }
+
+  @override
+  Future<void> setReminderTime(ReminderTime time) {
+    _publish(_current.copyWith(reminderTime: time));
+    return _local.setReminderTime(time.toStorage());
+  }
+
   /// Closes the change stream (for tests: the app keeps one repository for
   /// its whole lifetime).
   Future<void> dispose() => _changes.close();
@@ -71,6 +97,14 @@ class SettingsRepositoryImpl implements SettingsRepository {
       catalogVersion: version != null && version >= 0
           ? version
           : defaults.catalogVersion,
+      themeMode:
+          AppThemeMode.values.asNameMap()[local.themeMode] ??
+          defaults.themeMode,
+      dynamicColor: local.dynamicColor ?? defaults.dynamicColor,
+      reminderEnabled: local.reminderEnabled ?? defaults.reminderEnabled,
+      reminderTime:
+          ReminderTime.tryParse(local.reminderTime ?? '') ??
+          defaults.reminderTime,
     );
   }
 }

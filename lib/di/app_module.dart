@@ -9,8 +9,12 @@ import 'package:dev_journey/core/database/daos/resources_dao.dart';
 import 'package:dev_journey/core/database/daos/search_dao.dart';
 import 'package:dev_journey/core/database/daos/user_data_dao.dart';
 import 'package:dev_journey/core/storage/settings_local_data_source.dart';
+import 'package:dev_journey/domain/model/app_info.dart';
+import 'package:dev_journey/domain/model/device_colors.dart';
+import 'package:dev_journey/domain/service/dynamic_color_source.dart';
 import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Registers types the app doesn't own, so they can be injected (and replaced
@@ -66,4 +70,23 @@ abstract class AppModule {
           allowList: SettingsLocalDataSource.allowList,
         ),
       );
+
+  /// The name and version for About, read once at launch.
+  @preResolve
+  @lazySingleton
+  Future<AppInfo> get appInfo async {
+    final info = await PackageInfo.fromPlatform();
+    return AppInfo(
+      name: info.appName,
+      version: info.version,
+      buildNumber: info.buildNumber,
+    );
+  }
+
+  /// The wallpaper's colors, read before `runApp` so the first frame is
+  /// already in them: reading them later would flash indigo, then repaint.
+  @preResolve
+  @lazySingleton
+  Future<DeviceColors> deviceColors(DynamicColorSource source) async =>
+      DeviceColors(wallpaperColor: await source.wallpaperColor());
 }

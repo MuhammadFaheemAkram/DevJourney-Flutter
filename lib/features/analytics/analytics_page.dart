@@ -1,23 +1,17 @@
-import 'package:dev_journey/core/design_system/design_system.dart';
-import 'package:dev_journey/features/shell/shell_drawer_scope.dart';
+import 'package:dev_journey/di/injection.dart';
+import 'package:dev_journey/features/analytics/analytics_view.dart';
+import 'package:dev_journey/features/analytics/cubit/analytics_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Analytics: a placeholder until Phase 6.
 class AnalyticsPage extends StatelessWidget {
   const AnalyticsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: const DrawerMenuButton(),
-        title: const Text('Analytics'),
-      ),
-      body: const EmptyStateView(
-        icon: Icons.insights_outlined,
-        title: 'Analytics',
-        message: 'Streaks, weekly progress and the activity heatmap arrive in Phase 6.',
-      ),
+    return BlocProvider(
+      create: (_) => getIt<AnalyticsCubit>()..load(),
+      child: const AnalyticsView(),
     );
   }
 }

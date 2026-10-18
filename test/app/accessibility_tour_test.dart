@@ -1,9 +1,11 @@
 import 'package:dev_journey/core/network/network_simulator.dart';
 import 'package:dev_journey/di/injection.dart';
+import 'package:dev_journey/domain/service/reminder_scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../helpers/app_harness.dart';
+import '../helpers/fakes/fake_reminder_scheduler.dart';
 
 // Every screen, in light and dark, with text at 200%: no layout overflows
 // (an overflow fails the test), tap targets of at least 48 × 48, a label on
@@ -85,6 +87,8 @@ void main() {
         ),
         ('Resources, with saved ones', '/resources'),
         ('Search, before typing', '/search'),
+        ('Analytics, with progress', '/analytics'),
+        ('Settings', '/settings'),
       ]) {
         testWidgets(name, (tester) async {
           await open(tester, at: location, withDemoProgress: true);
@@ -142,6 +146,14 @@ void main() {
         await open(tester, at: '/search', withDemoProgress: true);
         await tester.enterText(find.byType(TextField), 'stream');
         await tester.pumpUntilFound(find.textContaining('results'));
+        await expectAccessible(tester);
+      });
+
+      testWidgets('Settings, after notifications were denied', (tester) async {
+        await open(tester, at: '/settings', withDemoProgress: true);
+        (getIt<ReminderScheduler>() as FakeReminderScheduler).granted = false;
+        await tester.tap(find.text('Remind me to learn'));
+        await tester.pumpUntilFound(find.textContaining('Allow notifications'));
         await expectAccessible(tester);
       });
 

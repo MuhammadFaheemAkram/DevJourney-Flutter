@@ -1,4 +1,6 @@
+import 'package:dev_journey/domain/model/app_theme_mode.dart';
 import 'package:dev_journey/domain/model/learning_enums.dart';
+import 'package:dev_journey/domain/model/roadmap_progress.dart';
 
 // How the domain's enums read on screen. Text lives in the UI layer, never
 // in the domain.
@@ -86,4 +88,25 @@ String minutesLabel(int minutes) {
   final hours = minutes ~/ 60;
   final rest = minutes % 60;
   return rest == 0 ? '$hours h' : '$hours h $rest min';
+}
+
+extension AppThemeModeLabel on AppThemeMode {
+  String get label => switch (this) {
+    AppThemeMode.system => 'System',
+    AppThemeMode.light => 'Light',
+    AppThemeMode.dark => 'Dark',
+  };
+}
+
+/// What a catalog sync brought: "3 new topics, 3 new resources", or
+/// "Everything is up to date".
+String syncSummary(SyncResult result) {
+  if (!result.hasNewContent) return 'Everything is up to date';
+  String count(int n, String what) => '$n new $what${n == 1 ? '' : 's'}';
+  return [
+    if (result.newRoadmaps > 0) count(result.newRoadmaps, 'roadmap'),
+    if (result.newTopics > 0) count(result.newTopics, 'topic'),
+    if (result.newResources > 0) count(result.newResources, 'resource'),
+    if (result.newChallenges > 0) count(result.newChallenges, 'challenge'),
+  ].join(', ');
 }

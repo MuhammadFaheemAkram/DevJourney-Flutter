@@ -59,6 +59,20 @@ class UserDataDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
+  /// Reset progress: everything the user *did* goes, in one transaction;
+  /// what they *wrote or planned* (notes, goals) stays.
+  Future<void> resetProgress() => transaction(() async {
+    for (final table in <TableInfo<Table, Object?>>[
+      topicProgress,
+      topicBookmarks,
+      resourceBookmarks,
+      goalCheckIns,
+      challengeStates,
+    ]) {
+      await delete(table).go();
+    }
+  });
+
   Future<void> _deleteAll() async {
     // Children before parents: check-ins point at goals.
     for (final table in <TableInfo<Table, Object?>>[

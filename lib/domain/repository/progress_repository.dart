@@ -25,4 +25,8 @@ abstract interface class ProgressRepository {
 
   /// Topics and challenges completed, everywhere, kept live.
   Stream<({int topics, int challenges})> watchCompletedCounts();
+
+  /// Clears completions, bookmarks, goal check-ins and challenge state in
+  /// one transaction. Notes, goals, the catalog and settings stay.
+  Future<Result<void>> resetProgress();
 }

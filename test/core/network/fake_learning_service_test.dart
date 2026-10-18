@@ -1,5 +1,6 @@
 import 'package:dev_journey/core/common/app_exception.dart';
 import 'package:dev_journey/core/network/asset_json_loader.dart';
+import 'package:dev_journey/core/network/catalog_publisher.dart';
 import 'package:dev_journey/core/network/fake_learning_service.dart';
 import 'package:dev_journey/core/network/network_simulator.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,11 @@ void main() {
 
   setUp(() {
     network = NetworkSimulator(latency: Duration.zero);
-    service = FakeLearningService(AssetJsonLoader(rootBundle), network);
+    service = FakeLearningService(
+      AssetJsonLoader(rootBundle),
+      network,
+      CatalogPublisher(),
+    );
   });
 
   test('serves the bundled catalog and demo progress', () async {

@@ -37,8 +37,8 @@ DevJourney is built in **strict, reviewable phases**. Each phase ends with:
 | 3 | Roadmaps, the learning path, topics and the Dashboard | ✅ Done |
 | 4 | Notes (Markdown) and goals | ✅ Done |
 | 5 | Challenges, resources and global search (FTS5) | ✅ Done |
-| 6 | Analytics, settings and daily reminders | ⏳ Next |
-| 7 | Open-source polish and final docs | |
+| 6 | Analytics, settings and daily reminders | ✅ Done |
+| 7 | Open-source polish and final docs | ⏳ Next |
 
 ---
 
@@ -82,10 +82,13 @@ Packages arrive in the phase that first needs them.
 | Text | `characters` (length limits that count what the user sees: "👩‍💻" is one character) | 4 |
 | Search | SQLite **FTS5** through drift (`search.drift`): a virtual table kept current by triggers, `bm25` ranking, `highlight()` / `snippet()` | 5 |
 | Links | `url_launcher` (`LaunchMode.inAppBrowserView`: Custom Tabs on Android, SFSafariViewController on iOS), behind a `LinkOpener` interface, https only | 5 |
+| Charts | [`fl_chart`](https://pub.dev/packages/fl_chart) (weekly and monthly bars); the activity heatmap is a `CustomPainter` | 6 |
+| Reminders | `flutter_local_notifications` (one repeating, zoned daily notification) + `timezone` + `flutter_timezone`; `app_settings` (the system's notification settings) | 6 |
+| Dynamic color | `dynamic_color` (the wallpaper's palette, Android 12+ only) | 6 |
+| App info | `package_info_plus` (the version in About) | 6 |
 | Lints / CI | `flutter_lints` + strict analyzer modes; GitHub Actions | 1 |
 | Testing | `flutter_test`, `bloc_test`, `mocktail`, `fake_async` (the search debounce in fake time) | 1+ |
 
-Planned: `fl_chart`, `flutter_local_notifications`, `dynamic_color`, `package_info_plus` (Phase 6).
 
 ---
 
@@ -164,7 +167,7 @@ DevJourney/
 │   │   ├── storage/                # settings_local_data_source (SharedPreferencesWithCache)
 │   │   ├── database/               # app_database (drift v2) + .steps.dart, search.drift (FTS5 + triggers), converters, tables/,
 │   │   │                           #   daos/ (catalog, learning, notes, goals, challenges, resources, search, user data)
-│   │   ├── platform/               # UrlLauncherLinkOpener (the in-app browser)
+│   │   ├── platform/               # UrlLauncherLinkOpener, LocalNotificationsReminderScheduler, MaterialYouColorSource
 │   │   └── common/                 # Result, AppException, guardWrite, firstValue, IdGenerator
 │   ├── data/                       # mapper/ (the API's catalog → rows, the demo progress → rows), repository/
 │   ├── domain/                     # model/ (CalendarDate, the catalog, learning paths, streaks, the Dashboard, AppSettings),
@@ -210,6 +213,7 @@ There is no server. `FakeLearningService` is the app's only "remote" API:
 - **The network is simulated:** `NetworkSimulator` waits 700 ms and can fail every request, as if offline. Welcome shows the error, with **Try again**.
 - **Checked before writing:** unique ids, non-blank titles, positive durations, `https` URLs, resources pointing at real topics. Broken content fails with "The learning content looks damaged" before anything is written.
 - **The sync is an upsert, in one transaction:** new content is inserted, existing content updated in place by its stable id, and the user's tables are never touched. It uses `INSERT … ON CONFLICT DO UPDATE`, never `INSERT OR REPLACE`: SQLite's `REPLACE` deletes the old row first, and that delete would cascade to the user's progress and notes. A test pins it.
+- **Developer switches** (Settings → Developer, in memory): **Simulate network failure**, and **Publish a catalog update**, after which the fake API serves `catalog_v2.json` (a new System Design section, an Accessibility topic, three resources, one edited description). Sync from Settings or Roadmaps: "3 new topics, 3 new resources", and roadmap percentages drop as they should.
 - **Demo progress has relative dates** (`daysAgo`), resolved against today when it loads, so the demo always shows a live streak.
 
 ## 💾 How Local Persistence Works
@@ -254,6 +258,19 @@ There is no server. `FakeLearningService` is the app's only "remote" API:
 - **Challenges:** filter by level and status; each has a prompt, hints revealed one at a time, a status (To do → In progress → Done) and **solution notes saved as you type** (after an 800 ms pause, and at once when you leave). Done records the day: it counts for the streak and challenge goals, and moving it back clears the day.
 - **Resources:** search, type chips and **Saved only**; a bookmark toggle on each card. A topic lists its resources too.
 
+## 📈 Analytics, Settings and Reminders
+
+- **Analytics is derived, live:** the same `UNION ALL` of dated events that goals use feeds pure functions: topics per ISO week (8 weeks) and per month (6 months), events per day (a 26-week heatmap), the streaks, and the **goal completion rate** over 30 days. A goal's period counts once it has ended (met or not), or once it's met; the current period isn't a miss yet, and periods before the goal existed don't count. Every chart has a written summary for screen readers.
+- **Appearance:** System, Light or Dark (a radio list at large text), applied app-wide by a `SettingsCubit` above `MaterialApp.router` and read before the first frame, so it never flashes. **Dynamic color** builds the scheme from the wallpaper's color on Android 12+; the switch isn't shown where the device has no palette (iOS).
+- **The daily reminder is one repeating notification** at a local time, scheduled with `flutter_local_notifications` in the device's time zone (`DateTimeComponents.time`), so it rings every day without the app running and survives reboots (the boot receiver). It's inexact on Android: a nudge doesn't need an exact-alarm permission.
+  - **Turning it on asks for permission** (Android 13+, iOS). Denied, the switch stays off and Settings explains where to allow notifications, with a button to the system's notification settings.
+  - **At launch and on resume** the app reschedules it in the current time zone, and turns the setting off if permission was revoked, so it never reads "on" while nothing can ring.
+  - The time picker is the platform's: Material's clock on Android, a wheel in a sheet on iOS.
+- **Reset progress** clears completions, bookmarks, goal check-ins and challenge work in one transaction; notes, goals, the catalog and settings stay. It asks first (an iOS alert on iOS).
+- **About** shows the version (`package_info_plus`), the open-source licenses and the editions on other platforms.
+
+**Platform setup:** Android enables core library desugaring and declares `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and the plugin's receivers; iOS sets the notification center's delegate in `AppDelegate`, so a reminder shows while the app is open.
+
 ---
 
 ## ✅ Testing
@@ -264,7 +281,8 @@ fvm dart format --output=none --set-exit-if-changed .
 fvm flutter test
 ```
 
-**470 tests** after Phase 5:
+**531 tests** after Phase 6:
+- **Analytics, settings and reminders:** weekly and monthly series (across years), events per day, the heatmap's first Monday, **the goal completion rate** (ended periods, the current one only once met, nothing before a goal existed); `ReminderTime` and the next reminder (across month and year ends); the settings surviving a relaunch, damaged values falling back; reset in the DAO (what goes, what stays); the reminder use cases against a fake scheduler (**on, denied, off, a new time, rescheduled at launch, revoked permission turning it off**); a published catalog update synced ("3 new topics", 7 of 13); the demo's analytics worked out by hand (6 of 19 goal periods); both settings Cubits and the Analytics Cubit on the real stack; the views with mocked Cubits; the heatmap; app flows (Dark for the whole app, the reminder denied then on then off, reset → the Dashboard starts over, a catalog update synced from Settings, Analytics following a completion, About).
 - **Search, challenges and resources:** `ftsQuery` (every FTS5 special character); highlight parsing and grouping; the search DAO (indexing on sync, prefixes, all words required, **title outranking body**, marked snippets, **the triggers on add, edit and delete**, no duplicates after a re-sync, live results, hostile text); **the v1 → v2 migration** (every path validated against a fresh schema; existing catalog rows and notes indexed; user rows kept; triggers working afterwards); the challenge and resource repositories (status transitions keeping the first start and day, notes kept across statuses, recent order, idempotent bookmarks); recent searches in preferences; the use cases (**https only**: http, `javascript:`, `file:`, `mailto:`, no host; a link the platform can't open); `SearchBloc` (the 300 ms debounce in fake time, only the last query running, the minimum length, **a newer query stopping older live results**, live results, recent searches, opening a resource); the Challenges, challenge, Resources and Topic detail Cubits on the real stack (filters, hints, **notes saved once per pause and on leaving**); their views and the Search view with mocked Cubits; the new widgets; app flows (a challenge to done with notes moving the Dashboard; save a resource and find it under Saved; search → open a note → a recent search; a new note found by search; a resource opened from search and from a topic).
 - **Notes and goals:** goal windows (ISO weeks across years, months and leap years) and progress by kind; the plain-text preview; the validation rules (grapheme counts); the notes DAO (order, search in titles and contents, **LIKE wildcards taken literally**, one topic's notes, `DELETE … RETURNING`, `SET NULL`) and the goals DAO (order, the `CHECK` on targets, the activity union, undo within the window only, `CASCADE`); both repositories (ids, times, update keeping the creation time, restore); the use cases (trimming, refusing invalid input, check-ins capped at the target, automatic goals refusing check-ins, a completion moving the goals); the Notes, editor and Goals Cubits on the real stack; their views with mocked Cubits (swipe and Undo, Preview, the discard guard, the goal sheet's bounds); `GoalCard`, `NoteRow`, the date labels; **Markdown in the theme colors, light and dark**; app flows (write, edit, swipe and Undo; a note from a topic; delete in the editor with Undo underneath; the discard guard; a goal reaching its target moving the Dashboard and the streak; a new goal; the Dashboard's notes).
 - **Learning:** the streak (today or not yet, gaps, month, year and leap-day boundaries, duplicates, future days), the recommendation, path counts; the learning DAO (the path as a tree, idempotent completion, section completion keeping earlier days, bookmarks, active days as a union, totals); the Dashboard use case with the demo worked out by hand (a 6-day streak, 7 of 12, State management next) and after completing a topic.
@@ -274,7 +292,7 @@ fvm flutter test
 - **Navigation:** every rule of the onboarding gate; typed locations; the app on its real DI graph (first launch, each tab, the drawer over every tab, each drawer screen and Back, Search from the app bars, the note editor as a full-screen dialog, deep links with a Close button, an unknown location).
 - **Design system:** the themes, any `ColorScheme` driving them (for dynamic color later), and WCAG AA contrast of every learning color (completed, streak, the three difficulties) on the page, cards and filled fields in both themes.
 - **The drawer:** its order, the selected tab, where each item leads.
-- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one with a note, the section confirmation, Notes, editing a note and its Preview, the topic picker, Goals and the goal sheet, Challenges, a challenge with notes and one with every hint shown, Resources, Search before typing and with results), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
+- **The accessibility tour:** every screen with real progress (the Dashboard, Roadmaps, a learning path, a topic to learn and a completed one with a note, the section confirmation, Notes, editing a note and its Preview, the topic picker, Goals and the goal sheet, Challenges, a challenge with notes and one with every hint shown, Resources, Search before typing and with results, Analytics, Settings, and Settings after notifications were denied), Welcome (ready and offline), and the drawer, in light and dark at 200 % text: no overflow, tap targets ≥ 48 × 48, labels, contrast. The tab labels keep their size at 300 % (a long press shows them).
 
 CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every pull request. It installs the FVM-pinned Flutter, checks that the committed generated code is up to date, then runs format, analyze and test.
 
@@ -306,6 +324,7 @@ CI (`.github/workflows/flutter-ci.yml`) runs on every push to `main` and every p
 - [Phase 3 — Roadmaps + Topics](docs/PHASE_3_SUMMARY.md)
 - [Phase 4 — Notes + Goals](docs/PHASE_4_SUMMARY.md)
 - [Phase 5 — Challenges + Resources + Search](docs/PHASE_5_SUMMARY.md)
+- [Phase 6 — Analytics + Settings + Reminders](docs/PHASE_6_SUMMARY.md)
 
 ---
 

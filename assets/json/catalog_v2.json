@@ -1,0 +1,996 @@
+{
+  "version": 2,
+  "roadmaps": [
+    {
+      "id": "flutter",
+      "title": "Flutter Developer",
+      "category": "mobile",
+      "description": "Build apps for Android and iOS from one Dart codebase, from the language to architecture and testing.",
+      "sections": [
+        {
+          "id": "flutter-dart",
+          "title": "Dart",
+          "topics": [
+            {
+              "id": "flutter-dart-basics",
+              "title": "Dart fundamentals",
+              "description": "Variables, functions, classes and collections: the language every Flutter app is written in.",
+              "objectives": [
+                "Declare variables with var, final and const",
+                "Write functions with named and optional parameters",
+                "Model data with classes and records"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "flutter-null-safety",
+              "title": "Null safety",
+              "description": "Dart's type system separates values that can be null from values that can't, and checks it at compile time.",
+              "objectives": [
+                "Tell nullable from non-nullable types",
+                "Use ?, !, ?? and late correctly",
+                "Promote a nullable value with a check"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 30
+            },
+            {
+              "id": "flutter-async",
+              "title": "Futures and async/await",
+              "description": "Work that finishes later: network calls, files, timers. Futures represent it; async and await keep it readable.",
+              "objectives": [
+                "Await a Future and handle its errors",
+                "Run independent work concurrently",
+                "Know when code runs on the event loop"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "flutter-streams",
+              "title": "Streams",
+              "description": "A sequence of values over time: user input, database changes, sockets. The backbone of reactive Flutter apps.",
+              "objectives": [
+                "Listen to a stream and cancel the subscription",
+                "Transform streams with map, where and asyncMap",
+                "Tell single-subscription from broadcast streams"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "flutter-ui",
+          "title": "UI",
+          "topics": [
+            {
+              "id": "flutter-widgets",
+              "title": "Widgets and the widget tree",
+              "description": "Everything on screen is a widget. Learn how widgets compose, rebuild and keep state.",
+              "objectives": [
+                "Compose screens from small widgets",
+                "Choose between stateless and stateful widgets",
+                "Understand BuildContext"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "flutter-layout",
+              "title": "Layout",
+              "description": "Rows, columns, stacks and constraints: how Flutter decides the size and position of every widget.",
+              "objectives": [
+                "Explain 'constraints go down, sizes go up'",
+                "Build responsive layouts with Flex and LayoutBuilder",
+                "Fix an overflow"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "flutter-navigation",
+              "title": "Navigation and routing",
+              "description": "Move between screens, pass data, handle deep links and keep tab state with a router.",
+              "objectives": [
+                "Push and pop routes",
+                "Declare routes with go_router",
+                "Handle a deep link"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "flutter-architecture",
+          "title": "Architecture",
+          "topics": [
+            {
+              "id": "flutter-state",
+              "title": "State management",
+              "description": "Where state lives and how the UI follows it: from setState to Cubits, Blocs and streams.",
+              "objectives": [
+                "Lift state out of widgets",
+                "Model screen states as immutable classes",
+                "Choose a Cubit or a Bloc"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "flutter-di",
+              "title": "Dependency injection",
+              "description": "Hand classes what they need instead of letting them create it, so they can be tested and replaced.",
+              "objectives": [
+                "Inject dependencies through constructors",
+                "Register services with get_it",
+                "Swap an implementation in tests"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 30
+            },
+            {
+              "id": "flutter-persistence",
+              "title": "Local persistence",
+              "description": "Keep data on the device: preferences for small values, SQLite with drift for everything else.",
+              "objectives": [
+                "Store settings with shared_preferences",
+                "Define tables and queries with drift",
+                "Watch a query as a stream"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 60
+            }
+          ]
+        },
+        {
+          "id": "flutter-quality",
+          "title": "Quality",
+          "topics": [
+            {
+              "id": "flutter-testing",
+              "title": "Testing",
+              "description": "Unit, widget and integration tests: proving the app works, and keeping it working.",
+              "objectives": [
+                "Write a unit test",
+                "Pump a widget and interact with it",
+                "Use fakes instead of real services"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "flutter-performance",
+              "title": "Performance",
+              "description": "Smooth frames and fast starts: measure first, then fix rebuilds, layouts and jank.",
+              "objectives": [
+                "Profile a frame in DevTools",
+                "Avoid unnecessary rebuilds",
+                "Build long lists lazily"
+              ],
+              "difficulty": "advanced",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "flutter-accessibility",
+              "title": "Accessibility",
+              "description": "Apps everyone can use: semantics for screen readers, large text, contrast and tap targets.",
+              "objectives": [
+                "Label controls for screen readers",
+                "Lay out for 200% text",
+                "Check contrast and tap targets in tests"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "title": "Backend Developer",
+      "category": "backend",
+      "description": "Design, secure and ship APIs with Python, FastAPI and PostgreSQL, packaged with Docker.",
+      "sections": [
+        {
+          "id": "backend-foundations",
+          "title": "Foundations",
+          "topics": [
+            {
+              "id": "backend-python",
+              "title": "Python essentials",
+              "description": "The syntax, data structures and tooling of the language most backends here are written in.",
+              "objectives": [
+                "Use lists, dicts and comprehensions",
+                "Write functions and classes",
+                "Manage packages in a virtual environment"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "backend-http",
+              "title": "HTTP and REST",
+              "description": "Requests, responses, methods and status codes: the protocol every API speaks.",
+              "objectives": [
+                "Pick the right method and status code",
+                "Design resource-oriented URLs",
+                "Explain idempotency"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "backend-apis",
+          "title": "APIs",
+          "topics": [
+            {
+              "id": "backend-fastapi",
+              "title": "FastAPI",
+              "description": "Build typed, documented APIs quickly, with validation from Python type hints.",
+              "objectives": [
+                "Declare path and query parameters",
+                "Validate bodies with Pydantic models",
+                "Read the generated OpenAPI docs"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "backend-auth",
+              "title": "Authentication",
+              "description": "Who is calling: passwords, tokens and sessions, and keeping them safe.",
+              "objectives": [
+                "Hash passwords",
+                "Issue and verify tokens",
+                "Protect an endpoint"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "backend-data",
+          "title": "Data",
+          "topics": [
+            {
+              "id": "backend-postgres",
+              "title": "PostgreSQL",
+              "description": "A relational database: tables, constraints, transactions and the guarantees they give.",
+              "objectives": [
+                "Model tables with keys and constraints",
+                "Use transactions",
+                "Read a query plan"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "backend-sql",
+              "title": "SQL queries and indexes",
+              "description": "Joins, aggregates and the indexes that make them fast.",
+              "objectives": [
+                "Write joins and GROUP BY queries",
+                "Choose an index for a query",
+                "Avoid N+1 queries"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "backend-shipping",
+          "title": "Shipping",
+          "topics": [
+            {
+              "id": "backend-docker",
+              "title": "Docker",
+              "description": "Package an app and its dependencies into an image that runs the same everywhere.",
+              "objectives": [
+                "Write a Dockerfile",
+                "Run containers with Compose",
+                "Keep images small"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-engineer",
+      "title": "AI Engineer",
+      "category": "ai",
+      "description": "Build with large language models: prompting, retrieval, tools and agents.",
+      "sections": [
+        {
+          "id": "ai-prompting",
+          "title": "Prompting",
+          "topics": [
+            {
+              "id": "ai-prompt-engineering",
+              "title": "Prompt engineering",
+              "description": "Clear instructions, examples and structure: getting reliable answers from a model.",
+              "objectives": [
+                "Write a clear, specific prompt",
+                "Use examples and structured output",
+                "Iterate on a prompt with test cases"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "ai-retrieval",
+          "title": "Retrieval",
+          "topics": [
+            {
+              "id": "ai-embeddings",
+              "title": "Embeddings and vector databases",
+              "description": "Turn text into vectors and find similar meaning with a nearest-neighbour search.",
+              "objectives": [
+                "Explain what an embedding is",
+                "Store and query vectors",
+                "Measure similarity"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "ai-rag",
+              "title": "Retrieval-augmented generation",
+              "description": "Give a model the right documents at question time, so it answers from your data.",
+              "objectives": [
+                "Chunk and index documents",
+                "Retrieve context for a question",
+                "Cite sources in answers"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "ai-langchain",
+              "title": "Orchestration with LangChain",
+              "description": "Chain model calls, retrievers and tools with a framework.",
+              "objectives": [
+                "Build a simple chain",
+                "Connect a retriever",
+                "Know when a framework helps"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "ai-agents",
+          "title": "Agents",
+          "topics": [
+            {
+              "id": "ai-mcp",
+              "title": "Model Context Protocol",
+              "description": "An open protocol for connecting models to tools and data sources.",
+              "objectives": [
+                "Explain servers, clients and tools",
+                "Connect a server to a client",
+                "Expose a tool safely"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "ai-agents",
+              "title": "AI agents",
+              "description": "Models that plan, call tools and act over several steps, and how to keep them reliable.",
+              "objectives": [
+                "Tell workflows from agents",
+                "Design tools for a model",
+                "Add guardrails and evaluation"
+              ],
+              "difficulty": "advanced",
+              "estimatedMinutes": 60
+            },
+            {
+              "id": "ai-evaluation",
+              "title": "Evaluating LLM apps",
+              "description": "Measure quality with test sets, graders and regressions, not impressions.",
+              "objectives": [
+                "Build an evaluation set",
+                "Grade outputs automatically",
+                "Catch regressions before shipping"
+              ],
+              "difficulty": "advanced",
+              "estimatedMinutes": 45
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "system-design",
+      "title": "System Design",
+      "category": "architecture",
+      "description": "Design systems that scale: the building blocks and the trade-offs between them.",
+      "sections": [
+        {
+          "id": "sd-fundamentals",
+          "title": "Fundamentals",
+          "topics": [
+            {
+              "id": "sd-scalability",
+              "title": "Scalability",
+              "description": "Handling more users and data: vertical and horizontal scaling, and stateless services.",
+              "objectives": [
+                "Tell vertical from horizontal scaling",
+                "Make a service stateless",
+                "Estimate load"
+              ],
+              "difficulty": "beginner",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "sd-cap",
+              "title": "Consistency and CAP",
+              "description": "What a distributed system can promise when the network fails.",
+              "objectives": [
+                "State the CAP theorem",
+                "Compare strong and eventual consistency",
+                "Pick a consistency model"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "sd-building-blocks",
+          "title": "Building blocks",
+          "topics": [
+            {
+              "id": "sd-load-balancers",
+              "title": "Load balancers",
+              "description": "Spread traffic across servers and route around failures.",
+              "objectives": [
+                "Compare balancing algorithms",
+                "Add health checks",
+                "Explain sticky sessions"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 30
+            },
+            {
+              "id": "sd-caching",
+              "title": "Caching",
+              "description": "Serve repeated reads from memory: where to cache, and how to keep it fresh.",
+              "objectives": [
+                "Choose cache-aside or write-through",
+                "Pick an expiry strategy",
+                "Avoid a cache stampede"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            },
+            {
+              "id": "sd-queues",
+              "title": "Message queues",
+              "description": "Decouple producers from consumers and absorb bursts of work.",
+              "objectives": [
+                "Explain at-least-once delivery",
+                "Make consumers idempotent",
+                "Use a dead-letter queue"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 45
+            }
+          ]
+        },
+        {
+          "id": "sd-resilience",
+          "title": "Resilience",
+          "topics": [
+            {
+              "id": "sd-rate-limiting",
+              "title": "Rate limiting",
+              "description": "Protect a service from overload and abuse with token buckets and sliding windows.",
+              "objectives": [
+                "Implement a token bucket",
+                "Choose where to limit",
+                "Return the right response"
+              ],
+              "difficulty": "advanced",
+              "estimatedMinutes": 30
+            }
+          ]
+        },
+        {
+          "id": "sd-observability",
+          "title": "Observability",
+          "topics": [
+            {
+              "id": "sd-logging-metrics",
+              "title": "Logs and metrics",
+              "description": "Knowing what a running system does: structured logs, counters, histograms and dashboards.",
+              "objectives": [
+                "Write structured logs",
+                "Pick the metrics that matter",
+                "Alert on symptoms, not causes"
+              ],
+              "difficulty": "intermediate",
+              "estimatedMinutes": 40
+            },
+            {
+              "id": "sd-tracing",
+              "title": "Distributed tracing",
+              "description": "Following one request across services with trace and span ids to find where time goes.",
+              "objectives": [
+                "Propagate a trace id",
+                "Read a trace waterfall",
+                "Sample traces sensibly"
+              ],
+              "difficulty": "advanced",
+              "estimatedMinutes": 45
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "res-dart-language",
+      "title": "A tour of the Dart language",
+      "type": "documentation",
+      "url": "https://dart.dev/language",
+      "estimatedMinutes": 60,
+      "topicId": "flutter-dart-basics"
+    },
+    {
+      "id": "res-null-safety",
+      "title": "Sound null safety",
+      "type": "documentation",
+      "url": "https://dart.dev/null-safety",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-null-safety"
+    },
+    {
+      "id": "res-dart-async",
+      "title": "Asynchronous programming: futures, async, await",
+      "type": "documentation",
+      "url": "https://dart.dev/libraries/async/async-await",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-async"
+    },
+    {
+      "id": "res-dart-streams",
+      "title": "Asynchronous programming: streams",
+      "type": "documentation",
+      "url": "https://dart.dev/libraries/async/using-streams",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-streams"
+    },
+    {
+      "id": "res-flutter-ui",
+      "title": "Introduction to widgets",
+      "type": "documentation",
+      "url": "https://docs.flutter.dev/ui",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-widgets"
+    },
+    {
+      "id": "res-flutter-layout",
+      "title": "Layouts in Flutter",
+      "type": "documentation",
+      "url": "https://docs.flutter.dev/ui/layout",
+      "estimatedMinutes": 45,
+      "topicId": "flutter-layout"
+    },
+    {
+      "id": "res-flutter-navigation",
+      "title": "Navigation and routing",
+      "type": "documentation",
+      "url": "https://docs.flutter.dev/ui/navigation",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-navigation"
+    },
+    {
+      "id": "res-flutter-state",
+      "title": "State management",
+      "type": "article",
+      "url": "https://docs.flutter.dev/data-and-backend/state-mgmt",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-state"
+    },
+    {
+      "id": "res-bloc-library",
+      "title": "Bloc library",
+      "type": "documentation",
+      "url": "https://bloclibrary.dev",
+      "estimatedMinutes": 45,
+      "topicId": "flutter-state"
+    },
+    {
+      "id": "res-get-it",
+      "title": "get_it on pub.dev",
+      "type": "documentation",
+      "url": "https://pub.dev/packages/get_it",
+      "estimatedMinutes": 15,
+      "topicId": "flutter-di"
+    },
+    {
+      "id": "res-drift",
+      "title": "drift documentation",
+      "type": "documentation",
+      "url": "https://drift.simonbinder.eu",
+      "estimatedMinutes": 60,
+      "topicId": "flutter-persistence"
+    },
+    {
+      "id": "res-flutter-testing",
+      "title": "Testing Flutter apps",
+      "type": "documentation",
+      "url": "https://docs.flutter.dev/testing/overview",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-testing"
+    },
+    {
+      "id": "res-flutter-performance",
+      "title": "Performance",
+      "type": "documentation",
+      "url": "https://docs.flutter.dev/perf",
+      "estimatedMinutes": 45,
+      "topicId": "flutter-performance"
+    },
+    {
+      "id": "res-flutter-codelabs",
+      "title": "Flutter codelabs",
+      "type": "course",
+      "url": "https://docs.flutter.dev/codelabs",
+      "estimatedMinutes": 120
+    },
+    {
+      "id": "res-flutter-youtube",
+      "title": "Flutter on YouTube",
+      "type": "video",
+      "url": "https://www.youtube.com/@flutterdev",
+      "estimatedMinutes": 20
+    },
+    {
+      "id": "res-python-tutorial",
+      "title": "The Python tutorial",
+      "type": "documentation",
+      "url": "https://docs.python.org/3/tutorial/",
+      "estimatedMinutes": 120,
+      "topicId": "backend-python"
+    },
+    {
+      "id": "res-mdn-http",
+      "title": "An overview of HTTP",
+      "type": "article",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+      "estimatedMinutes": 20,
+      "topicId": "backend-http"
+    },
+    {
+      "id": "res-fastapi-tutorial",
+      "title": "FastAPI tutorial",
+      "type": "course",
+      "url": "https://fastapi.tiangolo.com/tutorial/",
+      "estimatedMinutes": 180,
+      "topicId": "backend-fastapi"
+    },
+    {
+      "id": "res-fastapi-security",
+      "title": "FastAPI security",
+      "type": "documentation",
+      "url": "https://fastapi.tiangolo.com/tutorial/security/",
+      "estimatedMinutes": 45,
+      "topicId": "backend-auth"
+    },
+    {
+      "id": "res-postgres-tutorial",
+      "title": "PostgreSQL tutorial",
+      "type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/tutorial.html",
+      "estimatedMinutes": 90,
+      "topicId": "backend-postgres"
+    },
+    {
+      "id": "res-index-luke",
+      "title": "Use the Index, Luke",
+      "type": "article",
+      "url": "https://use-the-index-luke.com",
+      "estimatedMinutes": 60,
+      "topicId": "backend-sql"
+    },
+    {
+      "id": "res-docker-get-started",
+      "title": "Docker: get started",
+      "type": "course",
+      "url": "https://docs.docker.com/get-started/",
+      "estimatedMinutes": 90,
+      "topicId": "backend-docker"
+    },
+    {
+      "id": "res-prompting-guide",
+      "title": "Prompt Engineering Guide",
+      "type": "article",
+      "url": "https://www.promptingguide.ai",
+      "estimatedMinutes": 45,
+      "topicId": "ai-prompt-engineering"
+    },
+    {
+      "id": "res-pgvector",
+      "title": "pgvector",
+      "type": "documentation",
+      "url": "https://github.com/pgvector/pgvector",
+      "estimatedMinutes": 20,
+      "topicId": "ai-embeddings"
+    },
+    {
+      "id": "res-rag-paper",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "type": "article",
+      "url": "https://arxiv.org/abs/2005.11401",
+      "estimatedMinutes": 60,
+      "topicId": "ai-rag"
+    },
+    {
+      "id": "res-langchain",
+      "title": "LangChain documentation",
+      "type": "documentation",
+      "url": "https://python.langchain.com",
+      "estimatedMinutes": 45,
+      "topicId": "ai-langchain"
+    },
+    {
+      "id": "res-mcp",
+      "title": "Model Context Protocol",
+      "type": "documentation",
+      "url": "https://modelcontextprotocol.io",
+      "estimatedMinutes": 30,
+      "topicId": "ai-mcp"
+    },
+    {
+      "id": "res-building-agents",
+      "title": "Building effective agents",
+      "type": "article",
+      "url": "https://www.anthropic.com/research/building-effective-agents",
+      "estimatedMinutes": 20,
+      "topicId": "ai-agents"
+    },
+    {
+      "id": "res-system-design-primer",
+      "title": "The System Design Primer",
+      "type": "course",
+      "url": "https://github.com/donnemartin/system-design-primer",
+      "estimatedMinutes": 240,
+      "topicId": "sd-scalability"
+    },
+    {
+      "id": "res-cap-kleppmann",
+      "title": "Please stop calling databases CP or AP",
+      "type": "article",
+      "url": "https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html",
+      "estimatedMinutes": 15,
+      "topicId": "sd-cap"
+    },
+    {
+      "id": "res-nginx-lb",
+      "title": "HTTP load balancing",
+      "type": "documentation",
+      "url": "https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/",
+      "estimatedMinutes": 20,
+      "topicId": "sd-load-balancers"
+    },
+    {
+      "id": "res-mdn-caching",
+      "title": "HTTP caching",
+      "type": "article",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching",
+      "estimatedMinutes": 25,
+      "topicId": "sd-caching"
+    },
+    {
+      "id": "res-rabbitmq-tutorials",
+      "title": "RabbitMQ tutorials",
+      "type": "course",
+      "url": "https://www.rabbitmq.com/tutorials",
+      "estimatedMinutes": 90,
+      "topicId": "sd-queues"
+    },
+    {
+      "id": "res-cloudflare-rate-limiting",
+      "title": "What is rate limiting?",
+      "type": "article",
+      "url": "https://www.cloudflare.com/learning/bots/what-is-rate-limiting/",
+      "estimatedMinutes": 10,
+      "topicId": "sd-rate-limiting"
+    },
+    {
+      "id": "res-bytebytego",
+      "title": "ByteByteGo on YouTube",
+      "type": "video",
+      "url": "https://www.youtube.com/@ByteByteGo",
+      "estimatedMinutes": 15
+    },
+    {
+      "id": "res-flutter-accessibility",
+      "title": "Accessibility in Flutter",
+      "type": "documentation",
+      "url": "https://docs.flutter.dev/ui/accessibility",
+      "estimatedMinutes": 30,
+      "topicId": "flutter-accessibility"
+    },
+    {
+      "id": "res-opentelemetry",
+      "title": "What is OpenTelemetry?",
+      "type": "documentation",
+      "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+      "estimatedMinutes": 15,
+      "topicId": "sd-tracing"
+    },
+    {
+      "id": "res-sre-monitoring",
+      "title": "Monitoring distributed systems",
+      "type": "article",
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+      "estimatedMinutes": 40,
+      "topicId": "sd-logging-metrics"
+    }
+  ],
+  "challenges": [
+    {
+      "id": "ch-fizzbuzz-stream",
+      "title": "FizzBuzz as a stream",
+      "category": "dart",
+      "difficulty": "beginner",
+      "prompt": "Write a function that returns a Stream<String> of FizzBuzz from 1 to n: \"Fizz\" for multiples of 3, \"Buzz\" for 5, \"FizzBuzz\" for both, the number otherwise.",
+      "hints": [
+        "Start from Stream.fromIterable over 1..n.",
+        "map each number to its word.",
+        "Test it with expectLater and emitsInOrder."
+      ]
+    },
+    {
+      "id": "ch-debounce",
+      "title": "Debounce a stream",
+      "category": "dart",
+      "difficulty": "intermediate",
+      "prompt": "Write a stream transformer that only emits a value after the source has been quiet for a given duration, as a search field needs.",
+      "hints": [
+        "A Timer per value: cancel the previous one.",
+        "Emit the latest value when the timer fires.",
+        "Don't forget to close when the source is done."
+      ]
+    },
+    {
+      "id": "ch-lru-cache",
+      "title": "An LRU cache",
+      "category": "dart",
+      "difficulty": "intermediate",
+      "prompt": "Implement a cache with a fixed capacity that evicts the least recently used entry when full. get and put should run in constant time.",
+      "hints": [
+        "A LinkedHashMap keeps insertion order.",
+        "Re-insert a key on every read to mark it recent.",
+        "Evict the first key when over capacity."
+      ]
+    },
+    {
+      "id": "ch-responsive-grid",
+      "title": "A responsive card grid",
+      "category": "ui",
+      "difficulty": "beginner",
+      "prompt": "Build a grid of cards that shows one column on a phone, two on a small tablet and four on a wide screen.",
+      "hints": [
+        "LayoutBuilder gives you the available width.",
+        "Pick a column count from breakpoints.",
+        "GridView.builder with SliverGridDelegateWithFixedCrossAxisCount."
+      ]
+    },
+    {
+      "id": "ch-expanding-faq",
+      "title": "An animated FAQ",
+      "category": "ui",
+      "difficulty": "intermediate",
+      "prompt": "Build a list of questions where tapping one expands its answer with an animation, and only one stays open at a time.",
+      "hints": [
+        "Keep the open index in the parent's state.",
+        "AnimatedSize or AnimatedCrossFade animate the height.",
+        "Announce the expanded state to screen readers."
+      ]
+    },
+    {
+      "id": "ch-infinite-list",
+      "title": "An infinite list with paging",
+      "category": "ui",
+      "difficulty": "advanced",
+      "prompt": "Show a list that loads the next page when the user nears the end, with a loading row, an error row with retry, and no duplicate requests.",
+      "hints": [
+        "Listen to the scroll position, or build a sentinel item.",
+        "Ignore load requests while one is in flight.",
+        "Model the list state as a sealed class."
+      ]
+    },
+    {
+      "id": "ch-top-three",
+      "title": "Top three per group",
+      "category": "sql",
+      "difficulty": "intermediate",
+      "prompt": "Given orders(customer_id, amount, created_at), return each customer's three largest orders.",
+      "hints": [
+        "A window function can number rows per customer.",
+        "ROW_NUMBER() OVER (PARTITION BY … ORDER BY …).",
+        "Filter on the row number in an outer query."
+      ]
+    },
+    {
+      "id": "ch-running-total",
+      "title": "Running totals",
+      "category": "sql",
+      "difficulty": "intermediate",
+      "prompt": "Given payments(day, amount), return every day with its running total since the first day.",
+      "hints": [
+        "SUM can be a window function.",
+        "Order the window by day.",
+        "Think about days with no payments."
+      ]
+    },
+    {
+      "id": "ch-find-gaps",
+      "title": "Find the gaps",
+      "category": "sql",
+      "difficulty": "advanced",
+      "prompt": "Given a table of activity days, find every gap: the first and last missing day of each run of days without activity.",
+      "hints": [
+        "Compare each day with the next one (LEAD).",
+        "A gap exists where the difference is more than one day.",
+        "This is how a streak can be computed in SQL."
+      ]
+    },
+    {
+      "id": "ch-url-shortener",
+      "title": "Design a URL shortener",
+      "category": "systemDesign",
+      "difficulty": "intermediate",
+      "prompt": "Design a service that turns long URLs into short ones and redirects. Expect 100 million new links a month and ten times as many reads.",
+      "hints": [
+        "Estimate storage and read traffic first.",
+        "How will you generate short, unique keys?",
+        "Reads dominate: where does a cache go?"
+      ]
+    },
+    {
+      "id": "ch-rate-limiter",
+      "title": "Design a rate limiter",
+      "category": "systemDesign",
+      "difficulty": "advanced",
+      "prompt": "Design a rate limiter for an API gateway that allows each client 100 requests a minute across many gateway servers.",
+      "hints": [
+        "Compare token bucket and sliding window.",
+        "Where is the shared counter kept?",
+        "What happens when the counter store is down?"
+      ]
+    },
+    {
+      "id": "ch-news-feed",
+      "title": "Design a news feed",
+      "category": "systemDesign",
+      "difficulty": "advanced",
+      "prompt": "Design the home feed of a social app: posts from the people you follow, newest first, for 50 million daily users.",
+      "hints": [
+        "Fan-out on write or on read?",
+        "Celebrities break fan-out on write.",
+        "Cache the first page of each feed."
+      ]
+    }
+  ]
+}
