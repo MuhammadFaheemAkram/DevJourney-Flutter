@@ -3,7 +3,7 @@
 ```bash
 fvm flutter analyze                                   # no issues allowed
 fvm dart format --output=none --set-exit-if-changed .
-fvm flutter test                                      # 531 tests, about 30 s
+fvm flutter test                                      # 534 tests, about 30 s
 ```
 
 CI (`.github/workflows/flutter-ci.yml`) runs the same commands on every push to `main` and every pull request. It also regenerates the code and fails if the committed files are stale.
@@ -19,12 +19,12 @@ CI (`.github/workflows/flutter-ci.yml`) runs the same commands on every push to 
 | Design system | 61 | themes, **WCAG contrast of every learning color** in both themes and any `ColorScheme`, labels and dates, the adaptive dialog on Android and iOS, the cards and rows, **Markdown in the theme colors in light and dark**, the heatmap, the large-text rule |
 | DAOs and SQL | 37 | the learning path as a tree, idempotent completion, section completion keeping earlier days, the active-days union, **LIKE wildcards taken literally**, `DELETE … RETURNING`, `CHECK`, `CASCADE`, `SET NULL`, the activity union, **FTS5: prefixes, all words required, title outranking body, marked snippets, the triggers on add, edit and delete, live results, hostile text**, reset |
 | Repositories | 33 | **user data surviving a re-sync** (no `REPLACE`), demo progress, notes (Undo restores the same note, a removed topic writes the null), goals, challenges (status transitions, the first start and day kept), resources, settings and recent searches surviving a relaunch |
-| Navigation | 30 | every rule of the onboarding gate, typed locations, the tabs and the drawer over every tab, screens above the shell, deep links with a Close button |
+| Navigation | 33 | every rule of the onboarding gate, typed locations, the tabs and the drawer over every tab, screens above the shell, deep links with a Close button (kept by a screen rebuilt while covered) |
 | App-level flows | 27 | the real app on the real DI graph: first launch (fresh, demo, offline and Try again), Continue → complete → the Dashboard follows, a section, notes CRUD with Undo, a goal reaching its target, a challenge to done with notes, a saved resource, search → a note, a catalog update synced from Settings, reset, Dark app-wide, the reminder, About |
 | Catalog, demo data and fake service | 19 | the bundled JSON itself, every validation rule of both mappers, relative dates, the simulated network |
 | drift migrations | 4 | every upgrade path against a fresh schema; **a seeded v1 database: rows kept, catalog and notes indexed, triggers working** |
 | DI | 1 | the real container resolves every Cubit, the Bloc, repository, DAO and service |
-| **Total** | **531** | |
+| **Total** | **534** | |
 
 ## How the tests are built
 

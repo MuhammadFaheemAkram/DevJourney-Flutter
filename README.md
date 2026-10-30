@@ -297,7 +297,7 @@ fvm dart format --output=none --set-exit-if-changed .
 fvm flutter test
 ```
 
-**531 tests**, all on every push:
+**534 tests**, all on every push:
 
 | Area | Tests |
 |---|---:|
